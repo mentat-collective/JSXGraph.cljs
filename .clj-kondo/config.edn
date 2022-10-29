@@ -1,0 +1,1 @@
+{:lint-as {jsxgraph.clerk-ui/cljs clojure.core/comment}}

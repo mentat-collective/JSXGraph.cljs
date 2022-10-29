@@ -1,0 +1,19 @@
+{:tasks
+ {dev
+  (do (shell "npm install")
+      (shell "shadow-cljs watch clerk"))
+
+  sha
+  (let [sha (clojure.string/trim (:out (shell {:out :string} "git rev-parse HEAD")))
+        file "public/index.html"]
+    (-> (slurp file)
+        (clojure.string/replace "$GIT_SHA" sha)
+        (->> (spit file))))
+
+  publish
+  (do (shell "npm install")
+      (shell "npm run release-clerk")
+      (shell "clojure -X:dev:clerk user/publish!")
+      (shell "rm public/index.html")
+      (shell "mv public/dev/jsxgraph/notebook.html" "public/index.html")
+      (run 'sha))}}
