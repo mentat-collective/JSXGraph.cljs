@@ -75,7 +75,7 @@
     nf     #(:n @!state)
     startf #(:start @!state)
     endf   #(:end @!state)
-    f      (fn [x] (Math/cos x))]
+    f      (fn [x] (js/Math.sin x))]
    [:<>
     [:pre (str @!state)]
     [jsx/JSXGraph {:boundingbox [-8 4 8 -5]
