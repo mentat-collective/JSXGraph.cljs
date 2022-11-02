@@ -12,9 +12,11 @@
    :output-dir "public/js"
    :asset-path "/js"
    :compiler-options
-   {:optimizations :advanced
+   {:optimizations :simple
+    :infer-externs :auto
     :output-wrapper false
-    :source-map false}}
+    :source-map false
+    :stable-names true}}
 
   :stories
   {:target :npm-module

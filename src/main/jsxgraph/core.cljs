@@ -34,7 +34,7 @@
                       (.substr 2 9)))
         style (or style {:height "400px" :width "100%"})
         kill! (fn [board]
-                (.suspendUpdate board)
+                (.suspendUpdate ^js board)
                 (-> (.-JSXGraph jsx) (.freeBoard board))
                 nil)
         init! (fn [props]
@@ -93,7 +93,7 @@
                 children)))})))
 
 (defn add-item! [name board elems props]
-  (let [p (.create board
+  (let [p (.create ^js board
                    name
                    (clj->js elems)
                    (clj->js (dissoc props :board)))]
@@ -113,9 +113,9 @@
       ;; out, mouseout
       ;; up, mouseup, touchend
       ;; down, mousedown, touchstart
-      (.on p "drag" (fn [_]
-                      (this-as point
-                        (f point)))))
+      (.on ^js p "drag" (fn [_]
+                          (this-as point
+                            (f point)))))
     p))
 
 (defn element [name]
@@ -128,7 +128,7 @@
                 (swap! !item
                        (fn [item]
                          (when item
-                           (.removeObject board item))
+                           (.removeObject ^js board item))
                          (add-item! name board elems props))))))]
       (re/create-class
        {:display-name name
@@ -141,7 +141,7 @@
               (swap! !item
                      (fn [item]
                        (when item
-                         (.removeObject board item))
+                         (.removeObject ^js board item))
                        nil)))))
         :reagent-render
         (fn [_props _elems] nil)}))))
@@ -165,20 +165,20 @@
 (def Circle (element "circle"))
 (def Circumcenter (element "circumcenter"))
 (def Circumcircle (element "circumcircle"))
-(def CircumcircleArc (element "Circumcirclearc"))
-(def CircumcircleSector (element "Circumcirclesector"))
+(def CircumcircleArc (element "circumcirclearc"))
+(def CircumcircleSector (element "circumcirclesector"))
 (def Comb (element "comb"))
 (def Conic (element "conic"))
 (def Curve (element "curve"))
 (def Curve3D (element "Curve3d"))
-(def CurveDifference (element "Curvedifference"))
-(def CurveIntersection (element "Curveintersection"))
-(def CurveUnion (element "Curveunion"))
+(def CurveDifference (element "curvedifference"))
+(def CurveIntersection (element "curveintersection"))
+(def CurveUnion (element "curveunion"))
 (def Derivative (element "derivative"))
 (def Ellipse (element "ellipse"))
-(def ForeignObject (element "Foreignobject"))
+(def ForeignObject (element "foreignobject"))
 (def FunctionGraph (element "functiongraph"))
-(def FunctionGraph3D (element "Functiongraph3d"))
+(def FunctionGraph3D (element "functiongraph3d"))
 (def Glider (element "glider"))
 (def Grid (element "grid"))
 (def Group (element "group"))
@@ -196,35 +196,35 @@
 (def Line (element "line"))
 (def Line3D (element "Line3d"))
 (def Locus (element "locus"))
-(def MajorArc (element "Majorarc"))
-(def MajorSector (element "Majorsector"))
+(def MajorArc (element "majorarc"))
+(def MajorSector (element "majorsector"))
 (def MetapostSpline (element "metapostspline"))
 (def Midpoint (element "midpoint"))
-(def MinorArc (element "Minorarc"))
-(def MinorSector (element "Minorsector"))
+(def MinorArc (element "minorarc"))
+(def MinorSector (element "minorsector"))
 (def MirrorElement (element "mirrorelement"))
 (def MirrorPoint (element "mirrorpoint"))
-(def NonReflexAngle (element "NonReflexangle"))
+(def NonReflexAngle (element "nonreflexangle"))
 (def Normal (element "normal"))
 (def OrthogonalProjection (element "orthogonalprojection"))
-(def OtherIntersection (element "Otherintersection"))
+(def OtherIntersection (element "otherintersection"))
 (def Parabola (element "parabola"))
 (def Parallel (element "parallel"))
 (def ParallelPoint (element "parallelpoint"))
-(def ParametricSurface3D (element "ParametricSurface3d"))
+(def ParametricSurface3D (element "parametricsurface3d"))
 (def Perpendicular (element "perpendicular"))
-(def PerpendicularPoint (element "Perpendicularpoint"))
-(def PerpendicularSegment (element "Perpendicularsegment"))
+(def PerpendicularPoint (element "perpendicularpoint"))
+(def PerpendicularSegment (element "perpendicularsegment"))
 (def Point (element "point"))
-(def Point3D (element "Point3d"))
-(def PolarLine (element "Polarline"))
-(def PolePoint (element "Polepoint"))
+(def Point3D (element "point3d"))
+(def PolarLine (element "polarline"))
+(def PolePoint (element "polepoint"))
 (def Polygon (element "polygon"))
-(def PolygonalChain (element "Polygonalchain"))
-(def RadicalAxis (element "Radicalaxis"))
+(def PolygonalChain (element "polygonalchain"))
+(def RadicalAxis (element "padicalaxis"))
 (def Reflection (element "reflection"))
-(def ReflexAngle (element "Reflexangle"))
-(def RegularPolygon (element "Regularpolygon"))
+(def ReflexAngle (element "reflexangle"))
+(def RegularPolygon (element "regularpolygon"))
 (def RiemannSum (element "riemannsum"))
 (def Sector (element "sector"))
 (def Segment (element "segment"))

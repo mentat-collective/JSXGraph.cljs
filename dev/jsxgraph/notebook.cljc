@@ -66,36 +66,46 @@
      (reagent/atom
       {:start -3 :end (* 2 Math/PI) :n 10})))
 
+(defn f [x]
+  (Math/sin x))
+
 (cljs
  (reagent/with-let
-   [init @!state
-    start-update (fn [s] (swap! !state assoc :start (.Value s)))
-    end-update (fn [s] (swap! !state assoc :end (.Value s)))
-    n-update (fn [s] (swap! !state assoc :n (.Value s)))
-    nf     #(:n @!state)
-    startf #(:start @!state)
-    endf   #(:end @!state)
-    f      (fn [x] (js/Math.sin x))]
-   [:<>
-    [:pre (str @!state)]
-    [jsx/JSXGraph {:boundingbox [-8 4 8 -5]
-                   :showCopyright false
-                   :axis true}
+   [
+    ;; init @!state
+    ;; start-update (fn [s] (swap! !state assoc :start (.Value s)))
+    ;; end-update (fn [s] (swap! !state assoc :end (.Value s)))
+    ;; n-update (fn [s] (swap! !state assoc :n (.Value s)))
+    ;; nf     #(:n @!state)
+    ;; startf #(:start @!state)
+    ;; endf   #(:end @!state)
+    ;; leftf  (fn [] "left")
+    ]
+   [jsx/JSXGraph {:boundingbox [-8 4 8 -5]
+                  :showCopyright false
+                  :axis true
+                  }
 
-     [jsx/Slider {:name "start"
-                  :on-drag start-update}
-      [[1 3.5] [5 3.5] [-10 (:start init) 0]]]
+    #_#_#_[jsx/Slider {:name "start"
+                       :on-drag start-update}
+           [[1 3.5] [5 3.5] [-10 (:start init) 0]]]
 
-     [jsx/Slider {:name "end"
-                  :on-drag end-update}
-      [[1 2.5]  [5 2.5]  [0 (:end init) 10]]]
+    [jsx/Slider {:name "end"
+                 :on-drag end-update}
+     [[1 2.5]  [5 2.5]  [0 (:end init) 10]]]
 
-     [jsx/Slider {:name "n"
-                  :snapWidth 1
-                  :on-drag n-update}
-      [[1 1.5] [5 1.5] [1 (:n init) 50]]]
+    [jsx/Slider {:name "n"
+                 :snapWidth 1
+                 :on-drag n-update}
+     [[1 1.5] [5 1.5] [1 (:n init) 50]]]
 
-     [jsx/FunctionGraph [f startf endf]]
-     [jsx/RiemannSum [f nf "left" startf endf]]]]))
+    #_#_[jsx/FunctionGraph {} [f startf endf]]
+    [jsx/RiemannSum    [f nf leftf startf endf]]]))
 
-;; More coming!
+(cljs
+ [:pre (str @!state)])
+
+;; More coming! Testing that this function isn't broken...
+
+(cljs
+ [:pre (f 10)])
