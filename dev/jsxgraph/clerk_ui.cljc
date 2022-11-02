@@ -26,7 +26,6 @@
                                             (if (vector? result)
                                               result
                                               (v/inspect result))))]
-                       (js/console.log path)
                        (when reagent-fn
                          (v/html [:div.my-1 [wrapper reagent-fn]]))))})))
 

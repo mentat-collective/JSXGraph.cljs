@@ -75,7 +75,7 @@
     nf     #(:n @!state)
     startf #(:start @!state)
     endf   #(:end @!state)
-    sin (fn [x] (Math/sin x))]
+    f      (fn [x] (Math/cos x))]
    [:<>
     [:pre (str @!state)]
     [jsx/JSXGraph {:boundingbox [-8 4 8 -5]
@@ -95,7 +95,7 @@
                   :on-drag n-update}
       [[1 1.5] [5 1.5] [1 (:n init) 50]]]
 
-     [jsx/FunctionGraph [sin startf endf]]
-     [jsx/RiemannSum [sin nf "left" startf endf]]]]))
+     [jsx/FunctionGraph [f startf endf]]
+     [jsx/RiemannSum [f nf "left" startf endf]]]]))
 
 ;; More coming!
