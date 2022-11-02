@@ -1,6 +1,6 @@
 # jsxgraph.cljs
 
-A light ClojureScript wrapper over [JSXGraph][JSXGRAPH].
+A light ClojureScript wrapper over [JSXGraph][JSXGRAPH]. In progress.
 
 [![Build Status](https://github.com/mentat-collective/jsxgraph.cljs/actions/workflows/kondo.yml/badge.svg?branch=main)](https://github.com/mentat-collective/jsxgraph.cljs/actions/workflows/kondo.yml)
 [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://github.com/sicmutils/sicmutils/blob/main/LICENSE)
