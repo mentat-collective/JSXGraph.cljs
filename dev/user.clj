@@ -20,6 +20,14 @@
     :browse? false
     :out-path "public"}))
 
+(defn publish-local! [_]
+  (swap! config/!resource->url merge {"/js/viewer.js" "/js/main.js"})
+  (clerk/build-static-app!
+   {:paths ["dev/jsxgraph/notebook.cljc"]
+    :bundle? false
+    :browse? false
+    :out-path "public"}))
+
 (comment
   (start!)
   (clerk/serve! {:browse? true})
