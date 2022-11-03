@@ -71,8 +71,7 @@
      (reagent/atom
       {:start -3 :end (* 2 Math/PI) :n 10})))
 
-(defn f [x]
-  (Math/sin x))
+;; And the example:
 
 (cljs
  (reagent/with-let
@@ -83,38 +82,31 @@
     nf     #(:n @!state)
     startf #(:start @!state)
     endf   #(:end @!state)
-    leftf  (fn [] "left")]
-   [jsx/JSXGraph {:boundingbox [-8 4 8 -5]
-                  :showCopyright false
-                  :axis true}
+    leftf  (fn [] "left")
+    ;; BUG: Using this line vs the next will cause an `unusable viewer nil` error.
+    ;; sin    #(Math/sin %)
+    sin (fn [x] (Math/sin x))]
+   [:<>
+    [:pre (str @!state)]
+    [jsx/JSXGraph {:boundingbox [-8 4 8 -5]
+                   :showCopyright false
+                   :axis true}
 
-    [jsx/Slider {:name "start"
-                 :on-drag start-update}
-     [[1 3.5] [5 3.5] [-10 (:start init) 0]]]
+     [jsx/Slider {:name "start"
+                  :on-drag start-update}
+      [[1 3.5] [5 3.5] [-10 (:start init) 0]]]
 
-    [jsx/Slider {:name "end"
-                 :on-drag end-update}
-     [[1 2.5]  [5 2.5]  [0 (:end init) 10]]]
+     [jsx/Slider {:name "end"
+                  :on-drag end-update}
+      [[1 2.5]  [5 2.5]  [0 (:end init) 10]]]
 
-    [jsx/Slider {:name "n"
-                 :snapWidth 1
-                 :on-drag n-update}
-     [[1 1.5] [5 1.5] [1 (:n init) 50]]]
+     [jsx/Slider {:name "n"
+                  :snapWidth 1
+                  :on-drag n-update}
+      [[1 1.5] [5 1.5] [1 (:n init) 50]]]
 
-    [jsx/FunctionGraph [f startf endf]]
-    [jsx/RiemannSum    [f nf leftf startf endf]]]))
 
-;; And this?
+     [jsx/FunctionGraph [sin startf endf]]
+     [jsx/RiemannSum    [sin nf leftf startf endf]]]]))
 
-(cljs
- [jsx/JSXGraph {:boundingbox [-8 4 8 -5]
-                :showCopyright false
-                :axis true}])
-
-(cljs
- [:pre (str @!state)])
-
-;; More coming! Testing that this function isn't broken...
-
-(cljs
- [:pre (f 10)])
+;; More coming!
