@@ -8,7 +8,7 @@
            [nextjournal.clerk.static-app
             nextjournal.viewer.notebook
             nextjournal.clerk.sci-viewer
-            jsxgraph.notebook]}}
+            jsxgraph.clerk-ui]}}
    :output-dir "public/js"
    :asset-path "/js"
    :build-options {:cache-level :off}
