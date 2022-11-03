@@ -43,6 +43,11 @@
   [jsx/Line {:strokeColor "#00ff00" :strokeWidth 2}
    ["A" "B"]]])
 
+;; And again?
+
+(cljs
+ [jsx/JSXGraph {:boundingbox [-5 5 5 -2] :showCopyright true}])
+
 ;; ## Circle
 
 ;; One possibility to construct a circle is to give its center and a point
@@ -69,38 +74,44 @@
 (defn f [x]
   (Math/sin x))
 
+#_
 (cljs
  (reagent/with-let
-   [
-    ;; init @!state
-    ;; start-update (fn [s] (swap! !state assoc :start (.Value s)))
-    ;; end-update (fn [s] (swap! !state assoc :end (.Value s)))
-    ;; n-update (fn [s] (swap! !state assoc :n (.Value s)))
-    ;; nf     #(:n @!state)
-    ;; startf #(:start @!state)
-    ;; endf   #(:end @!state)
-    ;; leftf  (fn [] "left")
-    ]
+   [init @!state
+    start-update (fn [s] (swap! !state assoc :start (.Value s)))
+    end-update (fn [s] (swap! !state assoc :end (.Value s)))
+    n-update (fn [s] (swap! !state assoc :n (.Value s)))
+    nf     #(:n @!state)
+    startf #(:start @!state)
+    endf   #(:end @!state)
+    leftf  (fn [] "left")]
    [jsx/JSXGraph {:boundingbox [-8 4 8 -5]
                   :showCopyright false
-                  :axis true
-                  }
+                  :axis true}
 
-    #_#_#_[jsx/Slider {:name "start"
-                       :on-drag start-update}
-           [[1 3.5] [5 3.5] [-10 (:start init) 0]]]
+    ;; [jsx/Slider {:name "start"
+    ;;              :on-drag start-update}
+    ;;  [[1 3.5] [5 3.5] [-10 (:start init) 0]]]
 
-    [jsx/Slider {:name "end"
-                 :on-drag end-update}
-     [[1 2.5]  [5 2.5]  [0 (:end init) 10]]]
+    ;; [jsx/Slider {:name "end"
+    ;;              :on-drag end-update}
+    ;;  [[1 2.5]  [5 2.5]  [0 (:end init) 10]]]
 
-    [jsx/Slider {:name "n"
-                 :snapWidth 1
-                 :on-drag n-update}
-     [[1 1.5] [5 1.5] [1 (:n init) 50]]]
+    ;; [jsx/Slider {:name "n"
+    ;;              :snapWidth 1
+    ;;              :on-drag n-update}
+    ;;  [[1 1.5] [5 1.5] [1 (:n init) 50]]]
 
-    #_#_[jsx/FunctionGraph {} [f startf endf]]
-    [jsx/RiemannSum    [f nf leftf startf endf]]]))
+    ;; [jsx/FunctionGraph {} [f startf endf]]
+    ;; [jsx/RiemannSum    [f nf leftf startf endf]]
+    ]))
+
+;; And this?
+
+(cljs
+ [jsx/JSXGraph {:boundingbox [-8 4 8 -5]
+                :showCopyright false
+                :axis true}])
 
 (cljs
  [:pre (str @!state)])
