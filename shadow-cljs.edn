@@ -1,4 +1,4 @@
-{:deps {:aliases [:dev :clerk :storybook]}
+{:deps {:aliases [:dev :clerk]}
  :dev-http {8765 "public"}
  :builds
  {:clerk
@@ -13,12 +13,4 @@
    :asset-path "/js"
    :compiler-options
    {:infer-externs :auto
-    :optimizations :advanced}}
-
-  :stories
-  {:target :npm-module
-   :compiler-options
-   {:infer-externs :auto
-    :optimizations :advanced}
-   :ns-regexp  "-stories$"
-   :output-dir "public/js/stories"}}}
+    :optimizations :advanced}}}}

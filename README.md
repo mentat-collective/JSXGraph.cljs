@@ -14,28 +14,6 @@ identical. I'll force-push over this at some point shortly.
 
 - TODO get the examples directory linked
 
-## Storybook
-
-```sh
-npm run watch
-```
-
-Starts shadow-cljs in a watcher,compiling the stories namespaces.
-
-In a separate terminal:
-
-```sh
-npm run start-storybook
-```
-
-starts a webserver.
-
-### Publishing to Github Pages
-
-```sh
-npm run deploy-storybook
-```
-
 ## License
 
 [MIT](LICENSE).
