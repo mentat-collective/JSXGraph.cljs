@@ -66,7 +66,6 @@
 
 ;; And the example:
 
-
 (cljs
  (reagent/with-let
    [init         @!state

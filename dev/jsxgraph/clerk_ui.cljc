@@ -29,8 +29,6 @@
         {:transform-fn nextjournal.clerk/mark-presented
          :render-fn '(fn [_#]
                        (let [result# (do ~@exprs)]
-                         (js/console.log (pr-str result#))
-                         (js/console.log (pr-str '~exprs))
                          (v/html
                           (if (vector? result#)
                             result#
