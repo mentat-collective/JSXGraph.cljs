@@ -11,12 +11,9 @@
             jsxgraph.clerk-ui]}}
    :output-dir "public/js"
    :asset-path "/js"
-   :build-options {:cache-level :off}
    :compiler-options
-
    {:infer-externs :auto
-    :optimizations :advanced
-    :source-map true}}
+    :optimizations :advanced}}
 
   :stories
   {:target :npm-module

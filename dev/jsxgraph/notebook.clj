@@ -96,3 +96,5 @@
 
      [jsx/FunctionGraph [sin startf endf]]
      [jsx/RiemannSum    [sin nf "left" startf endf]]]]))
+
+;; More coming!
