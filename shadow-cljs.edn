@@ -13,6 +13,7 @@
    :asset-path "/js"
    :build-options {:cache-level :off}
    :compiler-options
+
    {:infer-externs :auto
     :optimizations :advanced
     :source-map true}}

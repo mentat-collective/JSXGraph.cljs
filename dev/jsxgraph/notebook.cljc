@@ -74,7 +74,6 @@
 (defn f [x]
   (Math/sin x))
 
-#_
 (cljs
  (reagent/with-let
    [init @!state
@@ -89,22 +88,21 @@
                   :showCopyright false
                   :axis true}
 
-    ;; [jsx/Slider {:name "start"
-    ;;              :on-drag start-update}
-    ;;  [[1 3.5] [5 3.5] [-10 (:start init) 0]]]
+    [jsx/Slider {:name "start"
+                 :on-drag start-update}
+     [[1 3.5] [5 3.5] [-10 (:start init) 0]]]
 
-    ;; [jsx/Slider {:name "end"
-    ;;              :on-drag end-update}
-    ;;  [[1 2.5]  [5 2.5]  [0 (:end init) 10]]]
+    [jsx/Slider {:name "end"
+                 :on-drag end-update}
+     [[1 2.5]  [5 2.5]  [0 (:end init) 10]]]
 
-    ;; [jsx/Slider {:name "n"
-    ;;              :snapWidth 1
-    ;;              :on-drag n-update}
-    ;;  [[1 1.5] [5 1.5] [1 (:n init) 50]]]
+    [jsx/Slider {:name "n"
+                 :snapWidth 1
+                 :on-drag n-update}
+     [[1 1.5] [5 1.5] [1 (:n init) 50]]]
 
-    ;; [jsx/FunctionGraph {} [f startf endf]]
-    ;; [jsx/RiemannSum    [f nf leftf startf endf]]
-    ]))
+    [jsx/FunctionGraph [f startf endf]]
+    [jsx/RiemannSum    [f nf leftf startf endf]]]))
 
 ;; And this?
 
