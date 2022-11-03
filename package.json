@@ -2,7 +2,7 @@
   "name": "jsxgraph.cljs",
   "version": "0.0.1",
   "dependencies": {
-
+    "@mentatcollective/jsxgraph": "1.5.1"
   },
   "devDependencies": {
     "@babel/core": "^7.17.9",
@@ -17,7 +17,6 @@
     "@lezer/generator": "1.1.1",
     "@lezer/highlight": "1.1.2",
     "@lezer/lr": "1.2.3",
-    "@mentatcollective/jsxgraph": "1.5.0",
     "@storybook/addon-actions": "^6.4.22",
     "@storybook/addon-essentials": "^6.4.22",
     "@storybook/addon-interactions": "^6.4.22",
@@ -30,6 +29,7 @@
     "emoji-regex": "10.2.1",
     "framer-motion": "6.5.1",
     "gh-pages": "^3.2.3",
+    "http-server": "^14.1.1",
     "katex": "0.12.0",
     "lezer-clojure": "1.0.0-rc.2",
     "markdown-it": "12.3.2",
@@ -46,6 +46,7 @@
   },
   "homepage": "https://mentat-collective.github.io/jsxgraph.cljs",
   "scripts": {
+    "serve": "http-server -c-1",
     "watch": "shadow-cljs watch stories",
     "watch-clerk": "shadow-cljs watch clerk",
     "release-clerk": "shadow-cljs release clerk",

@@ -11,10 +11,12 @@
             jsxgraph.notebook]}}
    :output-dir "public/js"
    :asset-path "/js"
+   :build-options {:cache-level :off}
    :compiler-options
-   {:optimizations :advanced
-    :output-wrapper false
-    :source-map false}}
+
+   {:infer-externs :auto
+    :optimizations :advanced
+    :source-map true}}
 
   :stories
   {:target :npm-module

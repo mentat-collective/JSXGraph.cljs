@@ -20,3 +20,4 @@ pom.xml.asc
 .hg/
 .clerk/
 .cache/
+public

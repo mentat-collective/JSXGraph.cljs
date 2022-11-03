@@ -16,16 +16,16 @@
 #?(:clj
    (def reagent-viewer
      (viewer/process-render-fn
-      {:pred #(and (map? %) (contains? % :reagent/var))
-       :transform-fn clerk/mark-presented
+      {:transform-fn clerk/mark-presented
        :render-fn '(fn render-var [{var :reagent/var}]
                      (let [path (->> (clojure.string/split (str var) #"[./]")
                                      (mapv munge))
                            reagent-fn (applied-science.js-interop/get-in js/window path)
-                           wrapper (fn [f] (let [result (f)]
-                                            (if (vector? result)
-                                              result
-                                              (v/inspect result))))]
+                           wrapper (fn [f]
+                                     (let [result (f)]
+                                       (if (vector? result)
+                                         result
+                                         [v/inspect result])))]
                        (when reagent-fn
                          (v/html [:div.my-1 [wrapper reagent-fn]]))))})))
 
