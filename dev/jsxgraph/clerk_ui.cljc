@@ -6,27 +6,25 @@
   #?(:cljs
      (:require-macros [jsxgraph.clerk-ui])))
 
-;; ## Clerk ClojureScript/Reagent viewer
+;; ## SCI Customization
 ;;
-;; (for using compiled ClojureScript in a notebook)
-
-;; our API is a `hiccup` macro which will compile the contents as ClojureScript
-;; and render it using Reagent.
+;; The jsxgraph.core require and the following form make it possible to use this
+;; library's CLJS code in the Clerk notebooks that document the library.
 
 #?(:cljs
-   (do (sci/require-cljs-analyzer-api)
-       (swap! sv/!sci-ctx
-              sci/merge-opts
-              {:namespaces
-               {'jsxgraph.core
-                (sci/copy-ns jsxgraph.core (sci/create-ns 'jsxgraph.core))}
-               :classes {'Math js/Math}
-               :aliases {'jsx 'jsxgraph.core}})))
+   (swap! sv/!sci-ctx
+          sci/merge-opts
+          {:classes    {'Math js/Math}
+           :aliases    {'jsx 'jsxgraph.core}
+           :namespaces {'jsxgraph.core
+                        (sci/copy-ns jsxgraph.core (sci/create-ns 'jsxgraph.core))}}))
+
+;; ## Example Macro
 
 #?(:clj
    (defmacro cljs [& exprs]
-     `(nextjournal.clerk/with-viewer
-        {:transform-fn nextjournal.clerk/mark-presented
+     `(clerk/with-viewer
+        {:transform-fn clerk/mark-presented
          :render-fn '(fn [_#]
                        (let [result# (do ~@exprs)]
                          (v/html
