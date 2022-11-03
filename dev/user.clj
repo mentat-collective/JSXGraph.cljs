@@ -23,7 +23,7 @@
 (defn publish-local! [_]
   (swap! config/!resource->url merge {"/js/viewer.js" "/js/main.js"})
   (clerk/build-static-app!
-   {:paths ["dev/jsxgraph/notebook.cljc"]
+   {:paths ["dev/jsxgraph/notebook.clj"]
     :bundle? false
     :browse? false
     :out-path "public"}))

@@ -26,9 +26,7 @@
 
 ^#:nextjournal.clerk{:toc true :no-cache true :visibility :hide-ns}
 (ns jsxgraph.notebook
-  (:require #?(:cljs [jsxgraph.core :as jsx])
-            #?(:cljs [reagent.core :as reagent])
-            [jsxgraph.clerk-ui :as ui :refer [cljs]]))
+  (:require [jsxgraph.clerk-ui :refer [cljs]]))
 
 ;; ## Lines
 
@@ -61,29 +59,28 @@
 ;; This demo shows how to get the input talking to some state. There are issues
 ;; here that I'll document soon.
 
-#?(:cljs
-   (defonce !state
-     (reagent/atom
-      {:start -3 :end (* 2 Math/PI) :n 10})))
+(cljs
+ (defonce !state
+   (reagent/atom
+    {:start -3 :end (* 2 Math/PI) :n 10})))
 
 ;; And the example:
 
 (cljs
  (reagent/with-let
-   [init @!state
-    start-update (fn [s] (swap! !state assoc :start (.Value s)))
-    end-update (fn [s] (swap! !state assoc :end (.Value s)))
-    n-update (fn [s] (swap! !state assoc :n (.Value s)))
-    nf     #(:n @!state)
-    startf #(:start @!state)
-    endf   #(:end @!state)
-    sin    (fn [x] (Math/sin x))]
+   [init         @!state
+    start-update #(swap! !state assoc :start (.Value %))
+    end-update   #(swap! !state assoc :end (.Value %))
+    n-update     #(swap! !state assoc :n (.Value %))
+    nf           #(:n @!state)
+    startf       #(:start @!state)
+    endf         #(:end @!state)
+    sin          #(Math/sin %)]
    [:<>
     [:pre (str @!state)]
     [jsx/JSXGraph {:boundingbox [-8 4 8 -5]
                    :showCopyright false
                    :axis true}
-
      [jsx/Slider {:name "start"
                   :on-drag start-update}
       [[1 3.5] [5 3.5] [-10 (:start init) 0]]]
@@ -96,7 +93,6 @@
                   :snapWidth 1
                   :on-drag n-update}
       [[1 1.5] [5 1.5] [1 (:n init) 50]]]
-
 
      [jsx/FunctionGraph [sin startf endf]]
      [jsx/RiemannSum    [sin nf "left" startf endf]]]]))
