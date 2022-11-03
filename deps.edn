@@ -1,4 +1,4 @@
-{:paths ["src/main"]
+{:paths ["src"]
  :deps {reagent/reagent {:mvn/version "1.1.1"}}
 
  :aliases
@@ -6,9 +6,6 @@
   {:extra-deps
    {org.clojure/clojurescript {:mvn/version "1.11.4"}
     thheller/shadow-cljs {:mvn/version "2.17.4"}}}
-
-  :storybook
-  {:extra-paths ["src/examples" "src/stories"]}
 
   :clerk
   {:extra-paths ["dev"]
@@ -36,9 +33,6 @@
    :ns-default build}
 
   :lint
-  ;; Invoke with clj -M:dev:storybook:lint --lint src
+  ;; Invoke with clj -M:dev:lint --lint src
   {:main-opts ["-m" "clj-kondo.main"]
    :replace-deps {clj-kondo/clj-kondo {:mvn/version "RELEASE"}}}}}
-
-;; TODO next, try and get the build going and get SOMETHING showing at all, do
-;; that when I get home!! then try and get a jsxgraph showing.
