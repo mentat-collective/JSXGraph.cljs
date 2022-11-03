@@ -28,7 +28,7 @@
   ;; this should build everything...
   {:exec-fn nextjournal.clerk/build-static-app!
    :exec-args {:bundle? false
-               :paths ["dev/jsxgraph/notebook.cljc"]}}
+               :paths ["dev/jsxgraph/notebook.clj"]}}
 
   :build
   {:deps {io.github.clojure/tools.build {:git/tag "v0.8.2" :git/sha "ba1a2bf"}

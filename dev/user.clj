@@ -9,13 +9,13 @@
    {:browse? true
     :watch-paths ["dev"]})
   (Thread/sleep 500)
-  (clerk/show! "dev/jsxgraph/notebook.cljc"))
+  (clerk/show! "dev/jsxgraph/notebook.clj"))
 
 (defn publish! [_]
   ;; TODO this now defaults to a project page. Do we want to change this?
   (swap! config/!resource->url merge {"/js/viewer.js" "/jsxgraph.cljs/js/main.js"})
   (clerk/build-static-app!
-   {:paths ["dev/jsxgraph/notebook.cljc"]
+   {:paths ["dev/jsxgraph/notebook.clj"]
     :bundle? false
     :browse? false
     :out-path "public"}))
