@@ -23,8 +23,8 @@
 
 #?(:clj
    (defmacro cljs [& exprs]
-     `(clerk/with-viewer
-        {:transform-fn clerk/mark-presented
+     `(nextjournal.clerk/with-viewer
+        {:transform-fn nextjournal.clerk/mark-presented
          :render-fn '(fn [_#]
                        (let [result# (do ~@exprs)]
                          (v/html

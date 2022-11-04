@@ -14,7 +14,7 @@
 (defn publish! [_]
   ;; TODO this now defaults to a project page. Do we want to change this?
   (swap! config/!resource->url merge {"/js/viewer.js" "/jsxgraph.cljs/js/main.js"})
-  (clerk/build-static-app!
+  (clerk/build!
    {:paths ["dev/jsxgraph/notebook.clj"]
     :bundle? false
     :browse? false
@@ -22,7 +22,7 @@
 
 (defn publish-local! [_]
   (swap! config/!resource->url merge {"/js/viewer.js" "/js/main.js"})
-  (clerk/build-static-app!
+  (clerk/build!
    {:paths ["dev/jsxgraph/notebook.clj"]
     :bundle? false
     :browse? false
