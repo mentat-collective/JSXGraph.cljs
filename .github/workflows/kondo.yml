@@ -44,4 +44,4 @@ jobs:
 
       - name: Run clj-kondo
         run: |
-          clj-kondo --lint src --config '{:output {:pattern "::{{level}} file={{filename}},line={{row}},col={{col}}::{{message}}"}}'
+          clj-kondo --lint src:dev --config '{:output {:pattern "::{{level}} file={{filename}},line={{row}},col={{col}}::{{message}}"}}'
