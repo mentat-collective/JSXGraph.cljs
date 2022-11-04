@@ -24,7 +24,10 @@
 ;;
 ;; Hi!
 
-^#:nextjournal.clerk{:toc true :no-cache true :visibility :hide-ns}
+^#:nextjournal.clerk
+{:toc true
+ :no-cache true
+ :visibility :hide-ns}
 (ns jsxgraph.notebook
   (:require [jsxgraph.clerk-ui :refer [cljs]]))
 
@@ -96,5 +99,3 @@
 
      [jsx/FunctionGraph [sin startf endf]]
      [jsx/RiemannSum    [sin nf "left" startf endf]]]]))
-
-;; More coming!
