@@ -6,6 +6,7 @@ public/js
 /src/gen
 
 pom.xml
+!template/pom.xml
 pom.xml.asc
 *.iml
 *.jar
