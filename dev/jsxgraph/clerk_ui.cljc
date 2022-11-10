@@ -16,8 +16,9 @@
           sci/merge-opts
           {:classes    {'Math js/Math}
            :aliases    {'jsx 'jsxgraph.core}
-           :namespaces {'jsxgraph.core
-                        (sci/copy-ns jsxgraph.core (sci/create-ns 'jsxgraph.core))}}))
+           :namespaces
+           {'jsxgraph.core
+            (sci/copy-ns jsxgraph.core (sci/create-ns 'jsxgraph.core))}}))
 
 ;; ## Example Macro
 
