@@ -15,17 +15,13 @@
   github-pages
   (do (shell "npm install")
       (shell "npm run release-clerk")
-      (shell "clojure -X:dev:clerk user/github-pages!")
-      (shell "rm public/index.html")
-      (shell "mv public/dev/jsxgraph/notebook.html" "public/index.html")
+      (shell "clojure -X:nextjournal/clerk user/github-pages!")
       (run 'sha))
 
   publish-local
   (do (shell "npm install")
       (shell "npm run release-clerk")
-      (shell "clojure -X:dev:clerk user/publish-local!")
-      (shell "rm public/index.html")
-      (shell "mv public/dev/jsxgraph/notebook.html" "public/index.html")
+      (shell "clojure -X:nextjournal/clerk user/publish-local!")
       (run 'sha)
       (shell "npm run serve"))
 
