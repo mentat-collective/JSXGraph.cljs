@@ -2,36 +2,65 @@
 
 `clj`, `shadow-cljs`, `node` and `babashka`.
 
-## Releasing Github Pages
+## Github Pages, Docs Notebook
 
-TODO discuss the documentation notebook, how we build it, how we use Clerk etc.'
+The project's [Github Pages
+site](https://mentat-collective.github.io/jsxgraph.cljs) hosts an interactive
+[Clerk](https://github.com/nextjournal/clerk) notebook demonstrating the
+library's use.
 
-To generate the Github Pages site in the `public` folder, run:
+### Local Notebook Dev
+
+To start a shadow-cljs process watcher for the JS required to run the Clerk
+notebook, run
 
 ```
-bb github-pages
+bb dev-notebook
 ```
 
-This is run by the Github Action to actually publish.
+Then start a Clojure process however you like, and run `(user/start!)` to run
+the Clerk server. This command should open up `localhost:7777`.
 
-To locally generate a copy of the documentation notebook, run
+### Github Pages Static Build
+
+To test the Pages build locally:
 
 ```
 bb publish-local
 ```
 
-After the build is complete, visit http://127.0.0.1:8080/ to see the production
-build of the documentation notebook.
+This will generate the static site in `public`, start a development http server
+and open up a browser window (http://127.0.0.1:8080/) with the production build
+of the documentation notebook.
+
+### Pages Build
+
+To build and release to Github Pages:
+
+```
+bb release-gh-pages
+```
+
+This will ship the site to https://mentat-collective.github.io/jsxgraph.cljs/.
 
 ## Publishing to Clojars
 
-- Update the version in build.clj
-- Make a new Github Release
+The template for the project's `pom.xml` lives at
+[`template/pom.xml`](https://github.com/mentat-collective/jsxgraph.cljs/blob/main/template/pom.xml).
 
-Launching the release will create a new tag and trigger the following command:
+To create a new release:
+
+- Update the version in
+  [build.clj](https://github.com/mentat-collective/jsxgraph.cljs/blob/main/build.clj)
+- Make a new [Github
+  Release](https://github.com/mentat-collective/jsxgraph.cljs/releases) with tag
+  `v<the-new-version>`.
+
+Submitting the release will create the new tag and trigger the following
+command:
 
 ```
-clojure -T:build publish
+bb release
 ```
 
 The new release will appear on Clojars.

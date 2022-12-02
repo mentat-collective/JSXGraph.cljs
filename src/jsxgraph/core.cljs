@@ -7,7 +7,7 @@
   https://github.com/sritchie/jsxgraph and published to
   https://www.npmjs.com/package/@mentatcollective/jsxgraph, but these changes
   should appear upstream soon and we can back off to the official library."
-  (:require ["@mentatcollective/jsxgraph" :default jsx]
+  (:require ["@mentatcollective/jsxgraph$default" :as jsx]
             [reagent.core :as re :include-macros true]))
 
 ;; Utilities

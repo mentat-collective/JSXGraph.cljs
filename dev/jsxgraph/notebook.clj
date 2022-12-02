@@ -1,16 +1,25 @@
 ;; # JSXGraph.cljs
 ;;
-;; _alpha - [feedback welcome](https://github.com/mentat-collective/jsxgraph.cljs)_
+;; A light ClojureScript wrapper over [JSXGraph](https://jsxgraph.org/).
+
+;; [![Build Status](https://github.com/mentat-collective/jsxgraph.cljs/actions/workflows/kondo.yml/badge.svg?branch=main)](https://github.com/mentat-collective/jsxgraph.cljs/actions/workflows/kondo.yml)
+;; [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://github.com/mentat-collective/jsxgraph.cljs/blob/main/LICENSE)
+;; [![cljdoc badge](https://cljdoc.org/badge/org.mentat/jsxgraph.cljs)](https://cljdoc.org/d/org.mentat/jsxgraph.cljs/CURRENT)
+;; [![Clojars Project](https://img.shields.io/clojars/v/org.mentat/jsxgraph.cljs.svg)](https://clojars.org/org.mentat/jsxgraph.cljs)
 ;;
-;; Dynamic geometry!
+;; > The interactive documentation on this page was generated from [this source
+;; > file](https://github.com/mentat-collective/jsxgraph.cljs/blob/$GIT_SHA/dev/jsxgraph/notebook.clj)
+;; > using [Clerk](https://github.com/nextjournal/clerk). Follow
+;; > the [instructions in the
+;; > README](https://github.com/mentat-collective/jsxgraph.cljs/tree/main#interactive-documentation-via-clerk)
+;; > to run and modify this notebook on your machine!
 ;;
-;; ## Features
+;; See the [Github project](https://github.com/mentat-collective/jsxgraph.cljs)
+;; for more details, and the [cljdoc
+;; page](https://cljdoc.org/d/org.mentat/jsxgraph.cljs/CURRENT/doc/readme) for
+;; detailed API documentation.
 ;;
-;; 1. First feature!
-;;
-;; 2. Second feature.
-;;
-;; ## Usage
+;; ## Quickstart
 ;;
 ;; ```clj
 ;; ;; deps
@@ -21,8 +30,6 @@
 ;;   (:require [jsxgraph.core :as jsx]
 ;;             [reagent.core :as reagent]))
 ;;```
-;;
-;; Hi!
 
 ^#:nextjournal.clerk
 {:toc true
@@ -99,3 +106,22 @@
 
      [jsx/FunctionGraph [sin startf endf]]
      [jsx/RiemannSum    [sin nf "left" startf endf]]]]))
+
+;; ## Thanks and Support
+
+;; To support this work and my other open source projects, consider sponsoring
+;; me via my [GitHub Sponsors page](https://github.com/sponsors/sritchie). Thank
+;; you to my current sponsors!
+
+;; I'm grateful to [Clojurists Together](https://www.clojuriststogether.org/)
+;; for financial support during this library's creation. Please
+;; consider [becoming a member](https://www.clojuriststogether.org/developers/)
+;; to support this work and projects like it.
+
+;; ## License
+
+;; Copyright © 2022 Sam Ritchie.
+
+;; Distributed under the [MIT
+;; License](https://github.com/mentat-collective/jsxgraph.cljs/blob/main/LICENSE).
+;; See [LICENSE](https://github.com/mentat-collective/jsxgraph.cljs/blob/main/LICENSE).

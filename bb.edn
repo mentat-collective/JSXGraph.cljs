@@ -2,7 +2,7 @@
  {sha
   (let [sha (-> (shell {:out :string} "git rev-parse HEAD")
                 (:out)
-                (clojure.string/trim ))
+                (clojure.string/trim))
         file "public/index.html"]
     (-> (slurp file)
         (clojure.string/replace "$GIT_SHA" sha)
@@ -12,16 +12,23 @@
   (do (shell "npm install")
       (shell "npm run watch-clerk"))
 
-  github-pages
-  (do (shell "npm install")
+  start-clerk
+  (shell "clojure -X:dev:clerk user/start!")
+
+  publish-gh-pages
+  (do (shell "npm ci")
       (shell "npm run release-clerk")
-      (shell "clojure -X:nextjournal/clerk user/github-pages!")
+      (shell "clojure -X:dev:clerk user/github-pages!")
       (run 'sha))
+
+  release-gh-pages
+  (do (run 'publish-pages)
+      (shell "npm run gh-pages"))
 
   publish-local
   (do (shell "npm install")
       (shell "npm run release-clerk")
-      (shell "clojure -X:nextjournal/clerk user/publish-local!")
+      (shell "clojure -X:dev:clerk user/publish-local!")
       (run 'sha)
       (shell "npm run serve"))
 

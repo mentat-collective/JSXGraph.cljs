@@ -5,7 +5,7 @@
 ;; ## Variables
 
 (def lib 'org.mentat/jsxgraph.cljs)
-(def version "0.0.1")
+(def version "0.1.0")
 
 (defn- ->version
   ([] version)

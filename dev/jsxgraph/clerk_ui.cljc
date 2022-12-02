@@ -1,7 +1,7 @@
 (ns jsxgraph.clerk-ui
   (:require #?(:cljs [jsxgraph.core])
-            #?(:clj [nextjournal.clerk :as clerk])
-            #?(:cljs [nextjournal.clerk.sci-env :refer [!sci-ctx]])
+            #?(:clj  [nextjournal.clerk :as clerk])
+            #?(:cljs [nextjournal.clerk.sci-viewer :as sv])
             #?(:cljs [sci.core :as sci]))
   #?(:cljs
      (:require-macros [jsxgraph.clerk-ui])))
@@ -12,7 +12,7 @@
 ;; library's CLJS code in the Clerk notebooks that document the library.
 
 #?(:cljs
-   (swap! !sci-ctx
+   (swap! sv/!sci-ctx
           sci/merge-opts
           {:classes    {'Math js/Math}
            :aliases    {'jsx 'jsxgraph.core}
