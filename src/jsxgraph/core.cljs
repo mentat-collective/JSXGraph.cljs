@@ -16,9 +16,6 @@
 (defonce ^:no-doc board-context (react/createContext nil))
 (def ^:no-doc Provider (.-Provider board-context))
 
-(defn to-fixed [x p]
-  (.toFixed jsx x p))
-
 ;; Components
 
 (defn JSXGraph
@@ -115,94 +112,366 @@
 ;;
 ;; see `ElementType` in index.d.ts.
 
-(def Angle (element "angle"))
-(def Arc (element "arc"))
-(def Arrow (element "arrow"))
-(def ArrowParallel (element "arrowparallel"))
-(def Axis (element "axis"))
-(def Bisector (element "bisector"))
-(def Bisectorlines (element "bisectorlines"))
-(def Boxplot (element "boxplot"))
-(def Button (element "button"))
-(def CardinalSpline (element "cardinalspline"))
-(def Chart (element "chart"))
-(def Checkbox (element "checkbox"))
-(def Circle (element "circle"))
-(def Circumcenter (element "circumcenter"))
-(def Circumcircle (element "circumcircle"))
-(def CircumcircleArc (element "circumcirclearc"))
-(def CircumcircleSector (element "circumcirclesector"))
-(def Comb (element "comb"))
-(def Conic (element "conic"))
-(def Curve (element "curve"))
-(def Curve3D (element "Curve3d"))
-(def CurveDifference (element "curvedifference"))
-(def CurveIntersection (element "curveintersection"))
-(def CurveUnion (element "curveunion"))
-(def Derivative (element "derivative"))
-(def Ellipse (element "ellipse"))
-(def ForeignObject (element "foreignobject"))
-(def FunctionGraph (element "functiongraph"))
-(def FunctionGraph3D (element "functiongraph3d"))
-(def Glider (element "glider"))
-(def Grid (element "grid"))
-(def Group (element "group"))
-(def Hatch (element "hatch"))
-(def Hyperbola (element "hyperbola"))
-(def Image (element "image"))
-(def Incenter (element "incenter"))
-(def Incircle (element "incircle"))
-(def Inequality (element "inequality"))
-(def Input (element "input"))
-(def Integral (element "integral"))
-(def Intersection (element "intersection"))
-(def Label (element "label"))
-(def Legend (element "legend"))
-(def Line (element "line"))
-(def Line3D (element "Line3d"))
-(def Locus (element "locus"))
-(def MajorArc (element "majorarc"))
-(def MajorSector (element "majorsector"))
-(def MetapostSpline (element "metapostspline"))
-(def Midpoint (element "midpoint"))
-(def MinorArc (element "minorarc"))
-(def MinorSector (element "minorsector"))
-(def MirrorElement (element "mirrorelement"))
-(def MirrorPoint (element "mirrorpoint"))
-(def NonReflexAngle (element "nonreflexangle"))
-(def Normal (element "normal"))
-(def OrthogonalProjection (element "orthogonalprojection"))
-(def OtherIntersection (element "otherintersection"))
-(def Parabola (element "parabola"))
-(def Parallel (element "parallel"))
-(def ParallelPoint (element "parallelpoint"))
-(def ParametricSurface3D (element "parametricsurface3d"))
-(def Perpendicular (element "perpendicular"))
-(def PerpendicularPoint (element "perpendicularpoint"))
-(def PerpendicularSegment (element "perpendicularsegment"))
-(def Point (element "point"))
-(def Point3D (element "point3d"))
-(def PolarLine (element "polarline"))
-(def PolePoint (element "polepoint"))
-(def Polygon (element "polygon"))
-(def PolygonalChain (element "polygonalchain"))
-(def RadicalAxis (element "radicalaxis"))
-(def Reflection (element "reflection"))
-(def ReflexAngle (element "reflexangle"))
-(def RegularPolygon (element "regularpolygon"))
-(def RiemannSum (element "riemannsum"))
-(def Sector (element "sector"))
-(def Segment (element "segment"))
-(def Semicircle (element "semicircle"))
-(def Slider (element "slider"))
-(def SlopeTriangle (element "slopetriangle"))
-(def Spline (element "spline"))
-(def StepFunction (element "stepfunction"))
-(def Tangent (element "tangent"))
-(def TapeMeasure (element "tapemeasure"))
-(def Text (element "text"))
-(def Ticks (element "ticks"))
-(def TraceCurve (element "tracecurve"))
-(def Transformation (element "transformation"))
-(def Turtle (element "turtle"))
-(def View3D (element "view3D"))
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Angle.html"}
+  Angle
+  (element "angle"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Arc.html"}
+  Arc
+  (element "arc"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Arrow.html"}
+  Arrow
+  (element "arrow"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/ArrowParallel.html"}
+  ArrowParallel
+  (element "arrowparallel"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Axis.html"}
+  Axis
+  (element "axis"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Bisector.html"}
+  Bisector
+  (element "bisector"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Bisectorlines.html"}
+  Bisectorlines
+  (element "bisectorlines"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Boxplot.html"}
+  Boxplot
+  (element "boxplot"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Button.html"}
+  Button
+  (element "button"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/CardinalSpline.html"}
+  CardinalSpline
+  (element "cardinalspline"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Chart.html"}
+  Chart
+  (element "chart"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Checkbox.html"}
+  Checkbox
+  (element "checkbox"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Circle.html"}
+  Circle
+  (element "circle"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Circumcenter.html"}
+  Circumcenter
+  (element "circumcenter"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Circumcircle.html"}
+  Circumcircle
+  (element "circumcircle"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/CircumcircleArc.html"}
+  CircumcircleArc
+  (element "circumcirclearc"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/CircumcircleSector.html"}
+  CircumcircleSector
+  (element "circumcirclesector"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Comb.html"}
+  Comb
+  (element "comb"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Conic.html"}
+  Conic
+  (element "conic"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Curve.html"}
+  Curve
+  (element "curve"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Curve3D.html"}
+  Curve3D
+  (element "Curve3d"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/CurveDifference.html"}
+  CurveDifference
+  (element "curvedifference"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/CurveIntersection.html"}
+  CurveIntersection
+  (element "curveintersection"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/CurveUnion.html"}
+  CurveUnion
+  (element "curveunion"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Derivative.html"}
+  Derivative
+  (element "derivative"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Ellipse.html"}
+  Ellipse
+  (element "ellipse"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/ForeignObject.html"}
+  ForeignObject
+  (element "foreignobject"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/FunctionGraph.html"}
+  FunctionGraph
+  (element "functiongraph"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/FunctionGraph3D.html"}
+  FunctionGraph3D
+  (element "functiongraph3d"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Glider.html"}
+  Glider
+  (element "glider"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Grid.html"}
+  Grid
+  (element "grid"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Group.html"}
+  Group
+  (element "group"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Hatch.html"}
+  Hatch
+  (element "hatch"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Hyperbola.html"}
+  Hyperbola
+  (element "hyperbola"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Image.html"}
+  Image
+  (element "image"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Incenter.html"}
+  Incenter
+  (element "incenter"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Incircle.html"}
+  Incircle
+  (element "incircle"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Inequality.html"}
+  Inequality
+  (element "inequality"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Input.html"}
+  Input
+  (element "input"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Integral.html"}
+  Integral
+  (element "integral"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Intersection.html"}
+  Intersection
+  (element "intersection"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Label.html"}
+  Label
+  (element "label"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Legend.html"}
+  Legend
+  (element "legend"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Line.html"}
+  Line
+  (element "line"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Line3D.html"}
+  Line3D
+  (element "Line3d"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Locus.html"}
+  Locus
+  (element "locus"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/MajorArc.html"}
+  MajorArc
+  (element "majorarc"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/MajorSector.html"}
+  MajorSector
+  (element "majorsector"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/MetapostSpline.html"}
+  MetapostSpline
+  (element "metapostspline"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Midpoint.html"}
+  Midpoint
+  (element "midpoint"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/MinorArc.html"}
+  MinorArc
+  (element "minorarc"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/MinorSector.html"}
+  MinorSector
+  (element "minorsector"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Mirr.html"}
+  MirrorElement
+  (element "mirrorelement"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/MirrorPoint.html"}
+  MirrorPoint
+  (element "mirrorpoint"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/NonReflexAngle.html"}
+  NonReflexAngle
+  (element "nonreflexangle"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Normal.html"}
+  Normal
+  (element "normal"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/OrthogonalProjection.html"}
+  OrthogonalProjection
+  (element "orthogonalprojection"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/OtherIntersection.html"}
+  OtherIntersection
+  (element "otherintersection"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Parabola.html"}
+  Parabola
+  (element "parabola"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Parallel.html"}
+  Parallel
+  (element "parallel"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/ParallelPoint.html"}
+  ParallelPoint
+  (element "parallelpoint"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/ParametricSurface3D.html"}
+  ParametricSurface3D
+  (element "parametricsurface3d"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Perpendicular.html"}
+  Perpendicular
+  (element "perpendicular"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/PerpendicularPoint.html"}
+  PerpendicularPoint
+  (element "perpendicularpoint"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/PerpendicularSegment.html"}
+  PerpendicularSegment
+  (element "perpendicularsegment"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Point.html"}
+  Point
+  (element "point"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Point3D.html"}
+  Point3D
+  (element "point3d"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/PolarLine.html"}
+  PolarLine
+  (element "polarline"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/PolePoint.html"}
+  PolePoint
+  (element "polepoint"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Polygon.html"}
+  Polygon
+  (element "polygon"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/PolygonalChain.html"}
+  PolygonalChain
+  (element "polygonalchain"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/RadicalAxis.html"}
+  RadicalAxis
+  (element "radicalaxis"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Reflection.html"}
+  Reflection
+  (element "reflection"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/ReflexAngle.html"}
+  ReflexAngle
+  (element "reflexangle"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/RegularPolygon.html"}
+  RegularPolygon
+  (element "regularpolygon"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/RiemannSum.html"}
+  RiemannSum
+  (element "riemannsum"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Sector.html"}
+  Sector
+  (element "sector"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Segment.html"}
+  Segment
+  (element "segment"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Semicircle.html"}
+  Semicircle
+  (element "semicircle"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Slider.html"}
+  Slider
+  (element "slider"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/SlopeTriangle.html"}
+  SlopeTriangle
+  (element "slopetriangle"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Spline.html"}
+  Spline
+  (element "spline"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/StepFunction.html"}
+  StepFunction
+  (element "stepfunction"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Tangent.html"}
+  Tangent
+  (element "tangent"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/TapeMeasure.html"}
+  TapeMeasure
+  (element "tapemeasure"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Text.html"}
+  Text
+  (element "text"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Ticks.html"}
+  Ticks
+  (element "ticks"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/TraceCurve.html"}
+  TraceCurve
+  (element "tracecurve"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Transformation.html"}
+  Transformation
+  (element "transformation"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/Turtle.html"}
+  Turtle
+  (element "turtle"))
+
+(def ^{:doc "https://jsxgraph.org/docs/symbols/View3D.html"}
+  View3D
+  (element "view3D"))
