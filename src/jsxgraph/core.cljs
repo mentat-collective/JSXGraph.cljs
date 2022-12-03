@@ -169,25 +169,26 @@
             (.on p k callback)))))
     p))
 
-;; TODO: this is frustrating, so let's try the old thing.
-
 (defn element [name]
   (re/adapt-react-class
    (react/forwardRef
     (fn [props ref]
       (let [{:strs [board parents force] :as props} (js->clj props)
             props (dissoc props "board" "parents" "force")]
-        ;; TODO error if there are no parents or board.
-        ;; TODO why are we getting so busted with the useState approach???
+        ;; TODO error if there are no parents or board, or force. Use this in
+        ;; the context of the jsx!
+
+        ;; TODO why are we getting so busted with the useState approach??? One
+        ;; answer is I didn't have a dependency array for my ref. But even that
+        ;; passes too many calls.
         (react/useEffect
          (fn mount []
-           (js/console.log "rendering point")
-           (if-not board
-             (when ref (ref nil))
+           ;; sometimes a stale dead board is passed in.
+           (when (and board (.-renderer board))
+             (js/console.log "adding elem")
              (let [item (add-item! name board parents props)]
                (when ref (ref item))
                (fn unmount []
-                 (js/console.log "killing point")
                  (when board (.removeObject board item))
                  (when ref (ref nil))))))
          #js [board force])

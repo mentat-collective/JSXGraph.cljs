@@ -57,9 +57,9 @@
 ;; the stroke-width is not necessary.
 
 (cljs
- [jsx/JSXGraph {:boundingbox [-5 5 5 -2]
+ [jsx/JSXGraph {:boundingbox [-5 5 5 -1]
                 :showCopyright false}
-  [jsx/Point {:name "B" :size 4 :parents [-1 1]}]
+  [jsx/Point {:name "A" :size 4 :ref js/console.log :parents [-1 1]}]
   [jsx/Point {:name "A" :size 4 :parents [-2 1]}]])
 
 (comment
