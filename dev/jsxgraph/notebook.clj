@@ -91,6 +91,34 @@
   [Triangle
    [-1 -1] [1 1] [-1 1]]])
 
+;; ## Unit Circle
+
+(cljs
+ (defn UnitCircle [n]
+   (let [ids (vec (range n))]
+     (-> (into [:<>]
+               (map
+                (fn [i]
+                  (let [angle (* (/ i n) 2 Math/PI)
+                        x (Math/cos angle)
+                        y (Math/sin angle)]
+                    [jsx/Point {:name i :size 5 :parents [x y]}])))
+               ids)
+         (conj [jsx/Polygon {:parents (mapv str ids)
+                             :borders {:strokeColor "black"}}])))))
+
+(cljs
+ (reagent/with-let [!n    (reagent/atom 6)
+                    ->!n #(reset! !n (.Value %))]
+   [jsx/JSXGraph {:boundingbox [-1.5 2 1.5 -2]
+                  :showCopyright false}
+    [UnitCircle @!n]
+    [jsx/Slider {:name "n"
+                 :snapWidth 1
+                 :on {:drag ->!n}
+                 :parents
+                 [[-1 1.5] [1 1.5] [1 @!n 50]]}]]))
+
 ;; ## geonext
 
 ;; I think there's a bug where you can't delete then create. TODO can I try and file this?
