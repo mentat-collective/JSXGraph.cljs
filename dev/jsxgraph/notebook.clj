@@ -60,7 +60,40 @@
                      (when p
                        (.setName p "Point")))}]])
 
+;; Create directly from board ref
+
+(cljs
+ [jsx/JSXGraph
+  {:boundingbox [-5 5 5 -2]
+   :showCopyright false
+   :axis true
+   :ref
+   (fn [board]
+     (when board
+       (.create board "point"
+                (clj->js [1 1])
+                (clj->js {:name "Point"}))))}])
+
+;; ## Custom Components
+
+(cljs
+ (defn Triangle [a b c]
+   [:<>
+    [jsx/Point {:name "A" :size 4 :parents a}]
+    [jsx/Point {:name "B" :size 4 :parents b}]
+    [jsx/Point {:name "C" :size 4 :parents c}]
+    [jsx/Polygon {:parents ["A" "B" "C"]}]]))
+
+(cljs
+ [jsx/JSXGraph {:boundingbox [-5 5 5 -2]
+                :showCopyright false
+                :axis true}
+  [Triangle
+   [-1 -1] [1 1] [-1 1]]])
+
 ;; ## geonext
+
+;; I think there's a bug where you can't delete then create. TODO can I try and file this?
 
 (cljs
  [jsx/JSXGraph {:boundingbox [-5 5 5 -2]
@@ -73,7 +106,9 @@
               :size 4
               :parents ["X(A)" 2]}]])
 
-;; ## Lines
+;; ## Basics
+
+;; ### Lines
 
 ;; A line needs two points. Lets construct two points "A" and "B". Then we
 ;; construct a line through "A" and "B". The setting of a new color and changing
@@ -86,7 +121,7 @@
   [jsx/Line {:strokeColor "#00ff00" :strokeWidth 2
              :parents ["A" "B"]}]])
 
-;; ## Circle
+;; ### Circle
 
 ;; One possibility to construct a circle is to give its center and a point
 ;; defining its radius. Lets construct two points "A" and "B". Then we'll
@@ -144,3 +179,22 @@
 
      [jsx/FunctionGraph {:parents [sin startf endf]}]
      [jsx/RiemannSum {:parents [sin nf "left" startf endf]}]]]))
+
+;; ## Thanks and Support
+
+;; To support this work and my other open source projects, consider sponsoring
+;; me via my [GitHub Sponsors page](https://github.com/sponsors/sritchie). Thank
+;; you to my current sponsors!
+
+;; I'm grateful to [Clojurists Together](https://www.clojuriststogether.org/)
+;; for financial support during this library's creation. Please
+;; consider [becoming a member](https://www.clojuriststogether.org/developers/)
+;; to support this work and projects like it.
+
+;; ## License
+
+;; Copyright © 2022 Sam Ritchie.
+
+;; Distributed under the [MIT
+;; License](https://github.com/mentat-collective/mathlive.cljs/blob/main/LICENSE).
+;; See [LICENSE](https://github.com/mentat-collective/mathlive.cljs/blob/main/LICENSE).

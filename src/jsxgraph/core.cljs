@@ -7,15 +7,14 @@
   https://github.com/sritchie/jsxgraph and published to
   https://www.npmjs.com/package/@mentatcollective/jsxgraph, but these changes
   should appear upstream soon and we can back off to the official library."
-  (:require [clojure.string :refer [lower-case]]
-            ["@mentatcollective/jsxgraph$default" :as jsx]
+  (:require ["@mentatcollective/jsxgraph$default" :as jsx]
             [reagent.core :as re :include-macros true]
             ["react" :as react]))
 
 ;; Utilities
 
-(defonce my-context (react/createContext nil))
-(def Provider (.-Provider my-context))
+(defonce ^:no-doc board-context (react/createContext nil))
+(def ^:no-doc Provider (.-Provider board-context))
 
 (defn to-fixed [x p]
   (.toFixed jsx x p))
@@ -69,16 +68,10 @@
               base  [:div {:id id :style style}]]
           (if-not board
             base
-            (let [children (re/children
-                            (re/current-component))
-                  extras   {:board board}]
-              (into [:div {:id id :style style}]
-                    (map
-                     (fn [[a props & more]]
-                       (if (map? props)
-                         (into [a (into props extras)] more)
-                         (into [a extras props] more))))
-                    children)))))})))
+            [:div {:id id :style style}
+             (into [:> Provider {:value board}]
+                   (re/children
+                    (re/current-component)))])))})))
 
 (defn add-item! [name board elems props]
   (let [p (.create board
@@ -101,7 +94,8 @@
   (re/adapt-react-class
    (react/forwardRef
     (fn [props ref]
-      (let [{:strs [board parents] :as props} (js->clj props)
+      (let [board (react/useContext board-context)
+            {:strs [parents] :as props} (js->clj props)
             props (dissoc props "board" "parents" "force")]
         ;; TODO error if there are no parents or board, or force. Use this in
         ;; the context of the jsx!
@@ -212,32 +206,3 @@
 (def Transformation (element "transformation"))
 (def Turtle (element "turtle"))
 (def View3D (element "view3D"))
-
-;; ## Extensions
-;;
-;; TODO handle :<> in the children update for the board?? otherwise we can't use
-;; that without this trick.
-
-(defn Multi [{:keys [n] :or {n 1} :as m} i->c]
-  (letfn [(f [i]
-            (let [[component props & more] (i->c i)]
-              (into [component (into m props)] more)))]
-    (into [:<>] (map f) (range n))))
-
-(defn PointLine
-  "Annoyingly, if you want to make NEW components that wrap the others, you need
-  to be careful about passing along props down the line.
-
-  ```
-  [jsx/PointLine {} 3]
-  ```"
-  [props x]
-  (letfn [(f [i]
-            [Point [(- i) i] (assoc props :name (str i) :strokecolor "red")])]
-    (into [:<>] (map f) (range x))))
-
-;; TODO
-;;
-;; - add jsxgraph prefix to my special keywords like board, etc so they don't clash, counter too.
-;; - document the madness
-;; - rebuild one of the Sam Zhang essays using mathbox and jsxgraph. Get some!
