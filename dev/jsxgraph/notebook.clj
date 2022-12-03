@@ -44,25 +44,27 @@
 - API Reference: https://jsxgraph.org/docs/index.html each of the classes on the left has an associated class here.
 
 - Add docs to each of the `ElementType` entries.
-- convert to useEffect etc
-- add a `:ref` to each of these...
 - note that we are NOT GOING TO BE CLEVER with any of this stuff.
 ")
 
+
+;; ## Ref
+
+(cljs
+ [jsx/JSXGraph {:boundingbox [-5 5 5 -2]
+                :showCopyright false
+                :axis true}
+  [jsx/Point {:size 4
+              :parents [1 1]
+              :ref (fn [p]
+                     (when p
+                       (.setName p "Point")))}]])
 
 ;; ## Lines
 
 ;; A line needs two points. Lets construct two points "A" and "B". Then we
 ;; construct a line through "A" and "B". The setting of a new color and changing
 ;; the stroke-width is not necessary.
-
-(cljs
- [:<>
-  [jsx/JSXGraph {:boundingbox [-5 5 5 -2] :showCopyright false}
-   ;; TODO check ref behavior??
-   [jsx/Point {:name "A"
-               :size 4
-               :parents [-2 1]}]]])
 
 (cljs
  [jsx/JSXGraph {:boundingbox [-5 5 5 -2] :showCopyright false}
@@ -99,7 +101,7 @@
 (cljs
  (reagent/with-let
    [init         @!state
-    start-update #(do (js/console.log %) (swap! !state assoc :start (.Value %)))
+    start-update #(swap! !state assoc :start (.Value %))
     end-update   #(swap! !state assoc :end (.Value %))
     n-update     #(swap! !state assoc :n (.Value %))
     nf           #(:n @!state)
@@ -123,8 +125,7 @@
 
      [jsx/Slider {:name "n"
                   :snapWidth 1
-                  :on {:drag n-update
-                       :mouseover js/console.log}
+                  :on {:drag n-update}
                   :parents
                   [[1 1.5] [5 1.5] [1 (:n init) 50]]}]
 

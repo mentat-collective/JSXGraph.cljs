@@ -21,74 +21,61 @@
 
 (defn JSXGraph
   "TODO note that you can either add children etc... OR you can supply a ref that
-  just does all of this crap for you.
-
-  TODO can I have a component that just messes with the board itself?"
+  just does all of this crap for you."
   [{:keys [id style]} & _]
   (let [!board  (re/atom nil)
-        !force  (atom 0)
+
         id (or id (-> (Math/random)
                       (.toString 36)
                       (.substr 2 9)))
         style (or style {:height "400px" :width "100%"})
-        kill! (fn [board]
+        kill! (fn [board props]
                 (.suspendUpdate board)
                 (-> (.-JSXGraph jsx) (.freeBoard board))
+                (when-let [ref (:ref props)]
+                  (ref nil))
                 nil)
         init! (fn [props]
                 (let [board (-> (.-JSXGraph jsx)
                                 (.initBoard id (clj->js props)))]
-                  ;; initialize.
                   (when-let [ref (:ref props)]
                     (ref board))
                   board))]
     (re/create-class
      {:display-name  "JSXGraph"
-
-      ;;called after render.
       :component-did-mount
       (fn [this]
-        (js/console.log "board mounted")
         (reset! !board (init! (re/props this))))
 
       :component-will-unmount
-      (fn [_this]
-        (js/console.log "bye bye board")
-        (swap! !board kill!))
+      (fn [this]
+        (swap! !board kill! re/props this))
 
-      ;; Update if the props change. Not so bad!!
       :component-did-update
-      (fn [this old-argv]
-        (js/console.log "board-did-update")
-        (let [old-props (let [p (second old-argv)]
-                          (if (map? p) p {}))
+      (fn [this [_ p]]
+        (let [old-props (if (map? p) p {})
               new-props (or (re/props this) {})]
-          (when-not (= old-props new-props)
-            (js/console.log (str "board resetting!"))
+          (when (not= old-props new-props)
             (swap! !board (fn [old-board]
-                            (when old-board (kill! old-board))
+                            (when old-board (kill! old-board new-props))
                             (init! new-props))))))
 
       :reagent-render
       (fn [& _]
-        (let [this     (re/current-component)
-              children (re/children this)
-              extras   {:board @!board :force @!force}]
-          (js/console.log "rendering board")
-          ;; TODO note that this trick is forcing the children to re-render
-          ;; basically every single time. We are using react as a hack here :)
-          ;;
-          ;; But this means that, for now, you can't be updating this stuff with
-          ;; changing properties. You need to use a function that is going to
-          ;; access some state. That should be fine!
-          (swap! !force inc)
-          (into [:div {:id id :style style}]
-                (map
-                 (fn [[a props & more]]
-                   (if (map? props)
-                     (into [a (into props extras)] more)
-                     (into [a extras props] more))))
-                children)))})))
+        (let [board @!board
+              base  [:div {:id id :style style}]]
+          (if-not board
+            base
+            (let [children (re/children
+                            (re/current-component))
+                  extras   {:board board}]
+              (into [:div {:id id :style style}]
+                    (map
+                     (fn [[a props & more]]
+                       (if (map? props)
+                         (into [a (into props extras)] more)
+                         (into [a extras props] more))))
+                    children)))))})))
 
 (defn add-item! [name board elems props]
   (let [p (.create board
@@ -111,21 +98,20 @@
   (re/adapt-react-class
    (react/forwardRef
     (fn [props ref]
-      (let [{:strs [board parents force] :as props} (js->clj props)
+      (let [{:strs [board parents] :as props} (js->clj props)
             props (dissoc props "board" "parents" "force")]
-        ;; TODO error if there are no parents or board.
-        ;; TODO why are we getting so busted with the useState approach???
+        ;; TODO error if there are no parents or board, or force. Use this in
+        ;; the context of the jsx!
+
         (react/useEffect
          (fn mount []
-           (if-not board
-             (when ref (ref nil))
+           ;; sometimes a stale dead board is passed in.
+           (when (and board (.-renderer board))
              (let [item (add-item! name board parents props)]
                (when ref (ref item))
                (fn unmount []
                  (when board (.removeObject board item))
-                 (when ref (ref nil))))))
-         #js [board force])
-
+                 (when ref (ref nil)))))))
         nil)))))
 
 ;; ## Elements
