@@ -13,22 +13,22 @@
       (shell "npm run watch-clerk"))
 
   start-clerk
-  (shell "clojure -X:dev:clerk user/start!")
+  (shell "clojure -X:dev:nextjournal/clerk user/start!")
 
   publish-gh-pages
   (do (shell "npm ci")
       (shell "npm run release-clerk")
-      (shell "clojure -X:dev:clerk user/github-pages!")
+      (shell "clojure -X:dev:nextjournal/clerk user/github-pages!")
       (run 'sha))
 
   release-gh-pages
-  (do (run 'publish-pages)
+  (do (run 'publish-gh-pages)
       (shell "npm run gh-pages"))
 
   publish-local
   (do (shell "npm install")
       (shell "npm run release-clerk")
-      (shell "clojure -X:dev:clerk user/publish-local!")
+      (shell "clojure -X:dev:nextjournal/clerk user/publish-local!")
       (run 'sha)
       (shell "npm run serve"))
 

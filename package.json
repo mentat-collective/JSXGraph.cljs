@@ -20,6 +20,7 @@
     "d3-require": "^1.2.4",
     "emoji-regex": "^10.0.1",
     "framer-motion": "^6.2.8",
+    "gh-pages": "^3.2.3",
     "http-server": "^14.1.1",
     "katex": "^0.12.0",
     "lezer-clojure": "1.0.0-rc.2",

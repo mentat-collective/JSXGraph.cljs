@@ -6,7 +6,8 @@
 
    :modules
    {:main {:entries
-           [nextjournal.viewer.notebook
+           [nextjournal.clerk.static-app
+            nextjournal.viewer.notebook
             nextjournal.clerk.sci-viewer
             jsxgraph.clerk-ui]}}
    :output-dir "public/js"
