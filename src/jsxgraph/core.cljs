@@ -7,17 +7,15 @@
   https://github.com/sritchie/jsxgraph and published to
   https://www.npmjs.com/package/@mentatcollective/jsxgraph, but these changes
   should appear upstream soon and we can back off to the official library."
-  (:require ["@mentatcollective/jsxgraph$default" :as jsx]
-            [reagent.core :as re :include-macros true]))
+  (:require [clojure.string :refer [lower-case]]
+            ["@mentatcollective/jsxgraph$default" :as jsx]
+            [reagent.core :as re :include-macros true]
+            ["react" :as react]))
 
 ;; Utilities
 
 (defn to-fixed [x p]
   (.toFixed jsx x p))
-
-;; TODO extract various event handlers and attached
-;;
-;; TODO probably ALSO switch the order so that props always come first, THEN parents.
 
 ;; Components
 
@@ -96,55 +94,39 @@
   (let [p (.create board
                    name
                    (clj->js elems)
-                   (clj->js (dissoc props :board)))]
-    ;; Okay, SO, we can definitely get updates. but we want to UNREGISTER these
-    ;; if we can when the element gets taken out of commission.
-    #_(if-let [coords (.-coords p)]
-        (.on coords "update" (fn [_] (js/console.log (str (pr-str props) name " coords update fired"))))
-        (.on board "update" (fn [_] (js/console.log (str (.getType p) " update fired")))))
-
-    ;; TODO what are the possible events for OTHER types??
-    (when-let [f (props :on-drag)]
-
-      ;; events can be
-      ;; drag, mousedrag, touchdrag
-      ;; move, mousemove, touchmove
-      ;; over, mouseover
-      ;; out, mouseout
-      ;; up, mouseup, touchend
-      ;; down, mousedown, touchstart
-      (.on p "drag" (fn [_]
-                      (this-as point
-                        (f point)))))
+                   (clj->js props))]
+    (when-let [m (props "on")]
+      (doseq [[k f] m]
+        (let [callback (fn [_]
+                         (this-as elem
+                           (f elem)))]
+          (if (= k "update")
+            (if-let [coords (.-coords p)]
+              (.on coords "update" callback)
+              (.on board "update" callback))
+            (.on p k callback)))))
     p))
 
 (defn element [name]
-  (fn [_props _elems]
-    (let [!item (atom nil)
-          mount!
-          (fn [this _old-argv]
-            (let [[_ props elems] (re/argv this)]
-              (when-let [board (:board props)]
-                (swap! !item
-                       (fn [item]
-                         (when item
-                           (.removeObject board item))
-                         (add-item! name board elems props))))))]
-      (re/create-class
-       {:display-name name
-        :component-did-mount mount!
-        :component-did-update mount!
-        :component-will-unmount
-        (fn [this]
-          (let [[_ props] (re/argv this)]
-            (when-let [board (:board props)]
-              (swap! !item
-                     (fn [item]
-                       (when item
-                         (.removeObject board item))
-                       nil)))))
-        :reagent-render
-        (fn [_props _elems] nil)}))))
+  (re/adapt-react-class
+   (react/forwardRef
+    (fn [props ref]
+      (let [{:strs [board parents force] :as props} (js->clj props)
+            props (dissoc props "board" "parents" "force")]
+        ;; TODO error if there are no parents or board.
+        ;; TODO why are we getting so busted with the useState approach???
+        (react/useEffect
+         (fn mount []
+           (if-not board
+             (when ref (ref nil))
+             (let [item (add-item! name board parents props)]
+               (when ref (ref item))
+               (fn unmount []
+                 (when board (.removeObject board item))
+                 (when ref (ref nil))))))
+         #js [board force])
+
+        nil)))))
 
 ;; ## Elements
 ;;
