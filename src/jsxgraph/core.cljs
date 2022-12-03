@@ -14,6 +14,9 @@
 
 ;; Utilities
 
+(defonce my-context (react/createContext nil))
+(def Provider (.-Provider my-context))
+
 (defn to-fixed [x p]
   (.toFixed jsx x p))
 

@@ -60,6 +60,19 @@
                      (when p
                        (.setName p "Point")))}]])
 
+;; ## geonext
+
+(cljs
+ [jsx/JSXGraph {:boundingbox [-5 5 5 -2]
+                :showCopyright false
+                :axis true}
+  [jsx/Point {:name "A"
+              :size 4
+              :parents [1 1]}]
+  [jsx/Point {:name "B"
+              :size 4
+              :parents ["X(A)" 2]}]])
+
 ;; ## Lines
 
 ;; A line needs two points. Lets construct two points "A" and "B". Then we
@@ -113,15 +126,15 @@
     [jsx/JSXGraph {:boundingbox [-8 4 8 -5]
                    :showCopyright false
                    :axis true}
+
      [jsx/Slider {:name "start"
                   :on {:drag start-update}
                   :parents
                   [[1 3.5] [5 3.5] [-10 (:start init) 0]]}]
-
      [jsx/Slider {:name "end"
                   :on {:drag end-update}
                   :parents
-                  [[1 2.5]  [5 2.5]  [0 (:end init) 10]]}]
+                  [[1 2.5] [5 2.5] [0 (:end init) 10]]}]
 
      [jsx/Slider {:name "n"
                   :snapWidth 1
