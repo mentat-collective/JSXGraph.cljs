@@ -1,0 +1,9 @@
+{
+"version":3,
+"file":"shadow.js.shim.module$$mentatcollective$jsxgraph$default.js",
+"lineCount":3,
+"mappings":"AAAAA,IAAKC,CAAAA,OAAL,CAAa,0DAAb,CAAA;AACAC,MAAOC,CAAAA,EAAGC,CAAAA,IAAKC,CAAAA,yCAAf,GAA2DH,MAAOC,CAAAA,EAAGG,CAAAA,OAAV,CAAkB,0DAAlB,EAA8E,EAA9E,CAAA,CAAkF,SAAlF,CAA3D;;",
+"sources":["shadow.js.shim.module$$mentatcollective$jsxgraph$default.js"],
+"sourcesContent":["goog.provide(\"shadow.js.shim.module$$mentatcollective$jsxgraph$default\");\nshadow.js.shim.module$$mentatcollective$jsxgraph$default = shadow.js.require(\"module$node_modules$$mentatcollective$jsxgraph$src$index\", {})[\"default\"];\n"],
+"names":["goog","provide","shadow","js","shim","module$$mentatcollective$jsxgraph$default","require"]
+}
