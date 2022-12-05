@@ -1,3 +1,10 @@
+## Note about Fork
+
+This library is currently using my fork of jsxgraph at
+https://github.com/sritchie/jsxgraph and published to
+https://www.npmjs.com/package/@mentatcollective/jsxgraph, but these changes
+should appear upstream soon and we can back off to the official library.
+
 ## Dev Dependencies
 
 `clj`, `shadow-cljs`, `node` and `babashka`.

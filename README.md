@@ -1,6 +1,7 @@
 # jsxgraph.cljs
 
-A light ClojureScript wrapper over [JSXGraph][JSXGRAPH].
+A declarative [React][REACT] / [Reagent][REAGENT] interface to
+[JSXGraph][JSXGRAPH], written in [Clojurescript][CLJS].
 
 [![Build Status](https://github.com/mentat-collective/jsxgraph.cljs/actions/workflows/kondo.yml/badge.svg?branch=main)](https://github.com/mentat-collective/jsxgraph.cljs/actions/workflows/kondo.yml)
 [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://github.com/mentat-collective/jsxgraph.cljs/blob/main/LICENSE)
@@ -75,4 +76,5 @@ Distributed under the [MIT License](LICENSE). See [LICENSE](LICENSE).
 
 [CLJS]: https://clojurescript.org/
 [JSXGRAPH]: https://jsxgraph.org/
+[REACT]: https://reactjs.org/
 [REAGENT]: https://reagent-project.github.io/
