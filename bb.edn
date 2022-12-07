@@ -19,17 +19,15 @@
   (do (shell "npm ci")
       (shell "npm run release-clerk")
       (shell "clojure -X:dev:nextjournal/clerk user/github-pages!")
-      (run 'sha))
+      (run 'sha)
+      (shell "echo 'jsxgraph.mentat.org' > ./public/CNAME"))
 
   release-gh-pages
   (do (run 'publish-gh-pages)
       (shell "npm run gh-pages"))
 
   publish-local
-  (do (shell "npm install")
-      (shell "npm run release-clerk")
-      (shell "clojure -X:dev:nextjournal/clerk user/publish-local!")
-      (run 'sha)
+  (do (run 'publish-gh-pages)
       (shell "npm run serve"))
 
   release

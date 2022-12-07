@@ -12,20 +12,9 @@
   (clerk/show! "dev/jsxgraph/notebook.clj"))
 
 (defn github-pages! [_]
-  (swap! config/!resource->url merge
-         {"/js/viewer.js" "/jsxgraph.cljs/js/main.js"})
+  (swap! config/!resource->url merge {"/js/viewer.js" "/js/main.js"})
   (clerk/build!
    {:index "dev/jsxgraph/notebook.clj"
     :bundle? false
     :browse? false
     :out-path "public"}))
-
-(defn publish-local!
-  ([] (publish-local! nil))
-  ([_]
-   (swap! config/!resource->url merge {"/js/viewer.js" "/js/main.js"})
-   (clerk/build!
-    {:index "dev/jsxgraph/notebook.clj"
-     :bundle? false
-     :browse? false
-     :out-path "public"})))
