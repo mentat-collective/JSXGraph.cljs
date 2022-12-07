@@ -5,6 +5,24 @@
             [reagent.core :as re]
             ["react" :as react]))
 
+(comment
+  " TODO before release:
+
+
+
+- Add docs to each of the `ElementType` entries.
+- note that we are NOT GOING TO BE CLEVER with any of this stuff.
+- show what it looks like in jsxgraph vs non
+- fix license at bottom
+
+differences:
+
+- parents, props vs providing stuff in order
+- how to convert the `create` calls.
+- the handlers for events!
+- keywords vs classes
+")
+
 ;; ## Utilities
 
 (defonce ^{:no-doc true
@@ -586,7 +604,9 @@ to provide any element in `<children>` with access to the bound `board` instance
             [:div {:id id :style style}
              (into [:> Provider {:value board}]
                    ;; TODO error if component not found!
-                   (map (fn [[k & xs]]
-                          (into [(k->component k)] xs)))
+                   (map (fn [form]
+                          (when form
+                            (let [[k & xs] form]
+                              (into [(k->component k)] xs)))))
                    (re/children
                     (re/current-component)))])))})))

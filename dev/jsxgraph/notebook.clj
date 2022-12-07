@@ -1,6 +1,16 @@
+^#:nextjournal.clerk
+{:toc true
+ :no-cache true
+ :visibility :hide-ns}
+(ns jsxgraph.notebook
+  (:require [jsxgraph.clerk-ui :refer [cljs]]))
+
 ;; # JSXGraph.cljs
 ;;
-;; A light ClojureScript wrapper over [JSXGraph](https://jsxgraph.org/).
+;; A light [React](https://reactjs.org/)
+;; / [Reagent](https://reagent-project.github.io/) interface to
+;; the [JSXGraph](https://jsxgraph.org/) interactive geometry and mathematics
+;; library.
 
 ;; [![Build Status](https://github.com/mentat-collective/jsxgraph.cljs/actions/workflows/kondo.yml/badge.svg?branch=main)](https://github.com/mentat-collective/jsxgraph.cljs/actions/workflows/kondo.yml)
 ;; [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://github.com/mentat-collective/jsxgraph.cljs/blob/main/LICENSE)
@@ -13,225 +23,266 @@
 ;; > the [instructions in the
 ;; > README](https://github.com/mentat-collective/jsxgraph.cljs/tree/main#interactive-documentation-via-clerk)
 ;; > to run and modify this notebook on your machine!
+;; >
+;; > See the [Github
+;; > project](https://github.com/mentat-collective/jsxgraph.cljs) for more
+;; > details, and the [cljdoc
+;; > page](https://cljdoc.org/d/org.mentat/jsxgraph.cljs/CURRENT/doc/readme) for
+;; > detailed API documentation.
 ;;
-;; See the [Github project](https://github.com/mentat-collective/jsxgraph.cljs)
-;; for more details, and the [cljdoc
-;; page](https://cljdoc.org/d/org.mentat/jsxgraph.cljs/CURRENT/doc/readme) for
-;; detailed API documentation.
+;; ## What is JSXGraph?
 ;;
+;; [JSXGraph](https://jsxgraph.org/) is a JavaScript library that lets you build
+;; 2-dimensional scenes full of geometric objects, function curves and
+;; interactive UI elements, potentially with many complex constraints defined
+;; between these objects.
+;;
+;; For example, here is a visual JSXGraph proof that the [Euler
+;; line](https://en.wikipedia.org//wiki/Euler_line) passes through any
+;; triangle's [orthocenter](https://en.wikipedia.org/wiki/Orthocenter), [centroid](https://en.wikipedia.org/wiki/Centroid)
+;; and [circumcenter](https://en.wikipedia.org/wiki/Circumcenter). Drag the
+;; triangle's corner points around and watch the example respond:
+;;
+;; > The 'show code' link below will expand the example's source. Use the
+;; > checkmarks to toggle on and off the elements that contribute to each point
+;; > on the Euler Line.
+
+^{:nextjournal.clerk/visibility {:code :fold}}
+(cljs
+ (let [!state (atom
+               {:circumcenter true
+                :orthocenter true
+                :centroid true})
+       centroid?     #(:centroid @!state)
+       orthocenter?  #(:orthocenter @!state)
+       circumcenter? #(:circumcenter @!state)
+       cerise {:strokeColor "#901B77"
+               :fillColor "#CA147A"}
+       grass {:strokeColor "#009256"
+              :fillColor "#65B72E"
+              :visible true
+              :withLabel true}
+       perpendicular {:strokeColor "black"
+                      :visible orthocenter?
+                      :dash 1
+                      :strokeWidth 1}
+       median {:strokeWidth 1
+               :strokeColor "#333333"
+               :dash 2}]
+   [jsx/JSXGraph
+    {:boundingbox [-1.5 2 1.5 -1]
+     :showCopyright false
+     :keepaspectratio true}
+    [:checkbox {:parents [-2 1.5 "Circumcenter"]
+                :checked (:circumcenter @!state)
+                :on {:up #(swap! !state assoc :circumcenter (not (.Value %)))}}]
+    [:checkbox {:parents [-2 1.3 "Orthocenter"]
+                :checked (:orthocenter @!state)
+                :on {:up #(swap! !state assoc :orthocenter (not (.Value %)))}}]
+    [:checkbox {:parents [-2 1.1 "Centroid"]
+                :checked (:centroid @!state)
+                :on {:up #(swap! !state assoc :centroid (not (.Value %)))}}]
+
+    ;; Triangle
+    [:point (assoc cerise :parents [1 0] :id "A")]
+    [:point (assoc cerise :parents [-1 0] :id "B")]
+    [:point (assoc cerise :parents [0.65 1.45] :id "C")]
+    [:polygon
+     {:parents ["A" "B" "C"]
+      :borders {:ids ["pol_0" "pol_1" "pol_2"]}
+      :fillColor "#FFFF00"
+      :lines {:strokeWidth 2
+              :strokeColor "#009256"}}]
+
+    ;; ## Circumcircle
+    [:circumcircle
+     {:parents ["A" "B" "C"]
+      :strokeColor "#000000"
+      :visible circumcenter?
+      :dash 3
+      :strokeWidth 1
+      :center (assoc grass
+                     :name "U"
+                     :visible circumcenter?)}]
+
+    ;; ## Orthocenter
+    ;;
+    ;; Altitudes
+    [:perpendicular
+     (assoc perpendicular :parents ["pol_0" "C"] :id "pABC")]
+    [:intersection
+     (assoc cerise
+            :parents ["pol_0" "pABC"]
+            :visible orthocenter?
+            :name "H_c")]
+
+    [:perpendicular
+     (assoc perpendicular :parents ["pol_1" "A"] :id "pBCA")]
+    [:intersection
+     (assoc cerise
+            :parents ["pol_1" "pBCA"]
+            :visible orthocenter?
+            :name "H_a")]
+
+    [:perpendicular
+     (assoc perpendicular :parents ["pol_2" "B"] :id "pCAB")]
+    [:intersection
+     (assoc cerise
+            :parents ["pol_2" "pCAB"]
+            :visible orthocenter?
+            :name "H_b")]
+
+    ;; Intersection of Altitudes
+    [:intersection
+     (assoc grass
+            :visible orthocenter?
+            :id "i1"
+            :name "H"
+            :parents ["pABC" "pCAB" 0])]
+
+    ;; ## Centroid
+    ;;
+    ;; Medians
+    [:midpoint
+     (assoc cerise :name "M_a"
+            :visible centroid?
+            :parents ["B" "C"])]
+    [:segment
+     (assoc median :id "ma"
+            :visible centroid?
+            :parents ["M_a" "A"])]
+
+    [:midpoint
+     (assoc cerise :name "M_b"
+            :visible centroid?
+            :parents ["C" "A"])]
+    [:segment
+     (assoc median :id "mb"
+            :visible centroid?
+            :parents ["M_b" "B"])]
+
+    [:midpoint
+     (assoc cerise :name "M_c"
+            :visible centroid?
+            :parents ["A" "B"])]
+    [:segment
+     (assoc median :id "mc"
+            :visible centroid?
+            :parents ["M_c" "C"])]
+
+    ;; Intersection of Medians
+    [:intersection
+     (assoc grass :id "i2"
+            :visible centroid?
+            :name "S" :parents ["ma" "mc" 0])]
+
+    ;; Euler's Line (intersection of orthocenter and median, but the
+    ;; circumcenter lies on this line as well).
+    [:line
+     {:parents ["i1" "i2"]
+      :strokeWidth 2
+      :strokeColor "#901B77"}]]))
+;; [JSXGraph.cljs](https://github.com/mentat-collective/jsxgraph.cljs) extends
+;; JSXGraph with a [React](https://reactjs.org/)-friendly component that makes
+;; it easy to define JSXGraph constructions inside of a user interface built
+;; with Clojurescript.
+
 ;; ## Quickstart
+;;
+;; Install `JSXGraph.cljs` into your Clojurescript project using the
+;; instructions at its Clojars page:
+
+;; [![Clojars
+;;    Project](https://img.shields.io/clojars/v/org.mentat/jsxgraph.cljs.svg)](https://clojars.org/org.mentat/jsxgraph.cljs)
+;;
+;; Or grab the most recent code using a Git dependency:
 ;;
 ;; ```clj
 ;; ;; deps
-;; {org.mentat/jsxgraph.cljs {:git/sha "$GIT_SHA"}}
-;;
-;; ;; namespace
+;; {org.mentat/jsxgraph.cljs
+;;   {:git/sha "$GIT_SHA"}}
+;; ```
+
+;; Require `jsxgraph.core` in your namespace:
+
+;; ```clj
 ;; (ns my-app
 ;;   (:require [jsxgraph.core :as jsx]
 ;;             [reagent.core :as reagent]))
-;;```
-
-^#:nextjournal.clerk
-{:toc true
- :no-cache true
- :visibility :hide-ns}
-(ns jsxgraph.notebook
-  (:require [jsxgraph.clerk-ui :refer [cljs]]))
-
-(comment
-  " TODO before release:
-
-
-
-- Add docs to each of the `ElementType` entries.
-- note that we are NOT GOING TO BE CLEVER with any of this stuff.
-- show what it looks like in jsxgraph vs non
-
-differences:
-
-- parents, props vs providing stuff in order
-- how to convert the `create` calls.
-- the handlers for events!
-- keywords vs classes
-")
-
-;; this is a wrapper so the jsxgraph docs are indispensable.
-;;
-;; - API Reference: https://jsxgraph.org/docs/index.html each of the classes on
-;;   the left has an associated class here.
-;;
-;; [examples](https://jsxgraph.uni-bayreuth.de/wp/about/index.html), and [full
-;; wiki of
-;; examples](https://jsxgraph.uni-bayreuth.de/wiki/index.php/Category:Examples).
-;;
-;; ## Porting
-;;
-;; you'll probably get started by porting an example.
-
-;; ## Converting an Example
-;;
-;; - use the id to refer to a previous component, since we don't have a bind.
-;; - if you really have to refer to the real thing, use an atom
-
-;; ### Basics
-
-;; ### Circle
-
-;; One possibility to construct a circle is to give its center and a point
-;; defining its radius. Lets construct two points "A" and "B". Then we'll
-;; construct a circle through "A" and "B".
-
-;; ```js
-;; var b = JXG.JSXGraph.initBoard('jxgbox', {boundingbox: [-5, 2, 5, -2]});
-;; var p1 = b.create('point',[0,0], {name:'A',size: 4, face: 'o'});
-;; var p2 = b.create('point',[2,-1], {name:'B',size: 4, face: 'o'})
-;; var ci = b.createElement('circle',["A","B"], {strokeColor:'#00ff00',strokeWidth:2});
-;; ```
-
-(cljs
- [jsx/JSXGraph {:boundingbox [-5 5 5 -2]}
-  [jsx/Point {:name "A" :size 4 :face "o" :parents [0 0]}]
-  [jsx/Point {:name "B" :size 4 :face "o" :parents [2 -1]}]
-  [jsx/Circle {:strokeColor "#00ff00" :strokeWidth 2
-               :parents ["A" "B"]}]])
-
-;; port using ref:
-
-(cljs
- [jsx/JSXGraph
-  {:boundingbox [-5 5 5 -2]
-   :ref (fn [b]
-          (let [p1 (jsx/create b "point" [0 0] {:name "A" :size 4 :face "o"})
-                p2 (jsx/create b "point" [2 -1] {:name "B" :size 4 :face "o"})]
-            (jsx/create b "circle"
-                        [p1 p2]
-                        {:strokeColor "#00ff00" :strokeWidth 2})))}])
-
-;; ### Graph
-
-;; ```javascript
-;; var board = JXG.JSXGraph.initBoard('jxgbox', {boundingbox: [-10, 10, 10, -10]});
-;; var a = board.create('slider', [[1,8],[5,8],[0,1,4]],{name:'a'});
-;; var b = board.create('slider', [[1,9],[5,9],[0,0.25,4]],{name:'b'});
-
-;; var c = board.create('curve', [function(phi){return a.Value()+b.Value()*phi; }, [0, 0],0, 8*Math.PI],
-;;              {curveType:'polar', strokewidth:4});
-
-;; var g = board.create('glider', [c]);
-;; var t = board.create('tangent', [g], {dash:2,strokeColor:'#a612a9'});
-;; var n = board.create('normal', [g], {dash:2,strokeColor:'#a612a9'});
-;; ```
-
-(cljs
- (reagent/with-let [!state (atom {:a 1 :b 0.25})]
-   [jsx/JSXGraph
-    {:boundingbox [-10 10 10 -10]
-     :showCopyright false
-     :style {:width "500px"
-             :height "500px"}}
-
-    ;; var a = board.create('slider', [[1,8],[5,8],[0,1,4]],{name:'a'});
-    [:slider {:parents [[1 8] [5 8] [0 (:a @!state) 4]]
-              :name "a"
-              :on {:drag #(swap! !state assoc :a (.Value %))}}]
-
-    ;; var b = board.create('slider', [[1,9],[5,9],[0,0.25,4]],{name:'b'});
-    [:slider {:parents [[1 9] [5 9] [0 (:b @!state) 4]]
-              :name "b"
-              :on {:drag #(swap! !state assoc :b (.Value %))}}]
-
-    ;; var c = board.create('curve', [function(phi){return a.Value()+b.Value()*phi; }, [0, 0],0, 8*Math.PI],
-    ;;              {curveType:'polar', strokewidth:4});
-    [:curve {:parents [(fn [phi]
-                         (let [{:keys [a b]} @!state]
-                           (+ a (* b phi))))
-                       [0, 0] 0  (* 8 Math/PI)]
-             :id "c"
-             :curveType "polar"
-             :strokewidth 4}]
-
-    ;; var g = board.create('glider', [c]);
-    [:glider  {:parents ["c"] :name "g"}]
-
-    ;; var t = board.create('tangent', [g], {dash:2,strokeColor:'#a612a9'});
-    [:tangent {:parents ["g"] :dash 2 :strokeColor "#a612a9"}]
-
-    ;; var n = board.create('normal', [g], {dash:2,strokeColor:'#a612a9'});
-    [:normal  {:parents ["g"] :dash 2 :strokeColor "#a612a9"}]]))
-
-;; see the note below about being careful here!!
-
-
-;; ### Another clone
-;;
-;; Lissajous curve (Lissajous figure or Bowditch curve) is the graph of the
-;; system of parametric equations
-;;
-;; $$x=A\sin(at+\delta),\quad y=B\sin(bt).$$
-;;
-;; Here is the JS code:
-
-;; ```js
-;; var a = brd.create('slider',[[2,8],[6,8],[0,3,6]],{name:'a'});
-;; var b = brd.create('slider',[[2,7],[6,7],[0,2,6]],{name:'b'});
-;; var A = brd.create('slider',[[2,6],[6,6],[0,3,6]],{name:'A'});
-;; var B = brd.create('slider',[[2,5],[6,5],[0,3,6]],{name:'B'});
-;; var delta = brd.create('slider',[[2,4],[6,4],[0,0,Math.PI]],{name:'&delta;'});
-
-;; var c = brd.create('curve',[
-;;           function(t){return A.Value()*Math.sin(a.Value()*t+delta.Value());},
-;;           function(t){return B.Value()*Math.sin(b.Value()*t);},
-;;           0, 2*Math.PI],{strokeColor:'#aa2233',strokeWidth:3});
 ;; ```
 ;;
-;; And then ours:
+;; The main entrypoint to the library is the `jsxgraph.core/JSXGraph` component.
+;; Each class in the [JSXGraph API](https://jsxgraph.org/docs/index.html) has a
+;; corresponding component bound as `jsx/ClassName`. Use these to build a simple
+;; arrow and drag it around by its point:
 
 (cljs
- (reagent/with-let [!state (atom {:a 3 :b 2 :A 3 :B 3 :delta 0})]
-   [jsx/JSXGraph
-    {:boundingbox [-12 10 12 -10]
-     :showCopyright false
-     :axis true}
+ [jsx/JSXGraph {:boundingbox [-2 2 2 -2]}
+  [jsx/Arrow {:name "A" :size 4
+              :parents [[0 0] [1 1]]}]])
 
-    ;; var a = brd.create('slider',[[2,8],[6,8],[0,3,6]],{name:'a'});
-    [:slider {:name "a" :parents [[2,8],[6,8],[0,3,6]]
-              :on {:drag #(swap! !state assoc :a (.Value %))}}]
+;; This guide assumes that you're coming at `JSXGraph` for the first time
+;; through `JSXGraph.cljs`. If you're coming from JavaScript, OR if you're
+;; attempting to port [one of the many JSXGraph
+;; examples](http://jsxgraph.org/wp/about/index.html), you'll absolutely need to
+;; read [JSXGraph vs JSXGraph.cljs](#JSXGraph%20vs%20JSXGraph.cljs) below.
 
-    ;; var b = brd.create('slider',[[2,7],[6,7],[0,2,6]],{name:'b'});
-    [:slider {:name "b" :parents [[2,7],[6,7],[0,2,6]]
-              :on {:drag #(swap! !state assoc :b (.Value %))}}]
+;; > If you're not familiar with React or Reagent, or what a "component" is,
+;; > please give the [Reagent homepage](https://reagent-project.github.io/) a
+;; > read. If this is your first Clojurescript experience, come say hi to me
+;; > @sritchie in the [Clojurians Slack](http://clojurians.net/) and I'll get
+;; > you started.
 
-    ;; var A = brd.create('slider',[[2,6],[6,6],[0,3,6]],{name:'A'});
-    [:slider {:name "A" :parents [[2,6],[6,6],[0,3,6]]
-              :on {:drag #(swap! !state assoc :A (.Value %))}}]
-
-    ;; var B = brd.create('slider',[[2,5],[6,5],[0,3,6]],{name:'B'});
-    [:slider {:name "B" :parents [[2,5],[6,5],[0,3,6]]
-              :on {:drag #(swap! !state assoc :B (.Value %))}}]
-
-    ;; var delta = brd.create('slider',[[2,4],[6,4],[0,0,Math.PI]],{name:'&delta;'});
-    [:slider {:name "&delta;" :parents [[2,4],[6,4],[0,0,Math.PI]]
-              :on {:drag #(swap! !state assoc :delta (.Value %))}}]
-
-    ;; var c = brd.create('curve',[
-    ;;           function(t){return A.Value()*Math.sin(a.Value()*t+delta.Value());},
-    ;;           function(t){return B.Value()*Math.sin(b.Value()*t);},
-    ;;           0, 2*Math.PI],{strokeColor:'#aa2233',strokeWidth:3});
-    [:curve
-     {:parents [(fn [t]
-                  (let [{:keys [a A delta]} @!state]
-                    (* A (Math/sin (+ (* a t) delta)))))
-                (fn [t]
-                  (let [{:keys [b B]} @!state]
-                    (* B (Math/sin (* b t)))))
-                0
-                (* 2 Math/PI)]
-      :strokeColor "#aa2233"
-      :strokewidth 3}]]))
-
-;; ## Ref
+;; ## Basics
 ;;
-;; sometimes you need access to the actual element...
+;; ### Creating a Scene
+;;
+;; Declare a scene (or a "board", or "graph") with the `jsx/JSXGraph` component.
+;; The component takes
+;;
+;; - a `keyword => value` map of attributes (see the `attributes` section under
+;;   `Parameters` at [this
+;;   page](https://jsxgraph.org/docs/symbols/JXG.JSXGraph.html)) for allowed
+;;   values
+;;
+;; - Any number of child components.
+;;
+;; Child components are added to the board in the order that they're listed. A
+;; full re-render is triggered any time any of the properties of the board or
+;; any child component changes.
+;;
+;; For example, here's a scene with two points and an arrow between them:
+
+(cljs
+ [jsx/JSXGraph {:boundingbox [-3 3 3 -3]}
+  [jsx/Point {:name "A" :size 1 :parents [-1 1]}]
+  [jsx/Point {:id "B" :name "BEE!" :size 1 :parents [2 -1]}]
+  [jsx/Arrow {:size 4
+              :parents ["A" "B"]}]])
+
+;; Note some details:
+;;
+;; - The points list initial points on the board as their parents. This leaves
+;;  them free to move! Drag each around.
+;;
+;; - The `Arrow` lists the IDs of each point as its parents. It's no longer free
+;;   to move, as its position is defined
+;;
+;; - The second point has a name different from its `id`. We did this so that we
+;;   could use one string for a label, and the other as an internal reference
+;;   for the `Arrow`.
+;;
+;; ### Event Listeners
+;;
+;; TODO go over how to get data out to some atom.
+;;
+;; ### Functions as Parents
+;;
+;; TODO go over how to bind stuff together
+;;
+;; ### Component Refs
+;;
+;; TODO sometimes you need access to the actual element...
 
 (cljs
  [jsx/JSXGraph {:boundingbox [-5 5 5 -2]
@@ -244,21 +295,28 @@ differences:
            (when p
              (.setName p "Point")))}]])
 
-;; Create directly from board ref
+;; ### Geonext syntax
+;;
+;; I can't find a good reference here... but note this bug https://github.com/jsxgraph/jsxgraph/issues/489
+;;
+;; I think there's a bug where you can't delete then create.
 
+;; TODO uncomment
+#_
 (cljs
- [jsx/JSXGraph
-  {:boundingbox [-5 5 5 -2]
-   :showCopyright false
-   :axis true
-   :ref
-   (fn [board]
-     (when board
-       (jsx/create
-        board
-        "point" [1 1] {:name "Point"})))}])
+ [jsx/JSXGraph {:boundingbox [-5 5 5 -2]
+                :showCopyright false
+                :axis true}
+  [jsx/Point {:name "A"
+              :size 4
+              :parents [1 1]}]
+  [jsx/Point {:name "B"
+              :size 4
+              :parents ["X(A)" 2]}]])
 
-;; ## Custom Components
+;; ## Intermediate Usage
+
+;; ### Custom Components
 ;;
 ;; You can use `:<>` to group primitives into a custom component.
 (cljs
@@ -276,7 +334,87 @@ differences:
   [Triangle
    [-1 -1] [1 1] [-1 1]]])
 
-;; ## Unit Circle
+;; NOTE that we can't use the keyword form here.
+
+;; ### SUBTLETIES
+;;
+;; TODO If you want to use a Reagent atom you're going to be in trouble and have to
+;; pull out the functions.
+
+;; ## Advanced Examples
+
+;; ### Archimedean Spiral
+
+;; Here's a more complex example; an interactive exploration of the [Archimedean
+;; Spiral](https://en.wikipedia.org/wiki/Archimedean_spiral).
+
+;; http://jsxgraph.org/wiki/index.php/Archimedean_spiral
+
+
+(cljs
+ (reagent/with-let [!state (atom {:a 1 :b 0.25})]
+   [jsx/JSXGraph
+    {:boundingbox [-10 10 10 -10]
+     :showCopyright false
+     :keepAspectRatio true}
+    [:slider {:name "a"
+              :parents [[1 8] [5 8] [0 (:a @!state) 4]]
+              :on {:drag #(swap! !state assoc :a (.Value %))}}]
+    [:slider {:name "b"
+              :parents [[1 9] [5 9] [0 (:b @!state) 4]]
+              :on {:drag #(swap! !state assoc :b (.Value %))}}]
+    [:curve {:id "c"
+             :parents [(fn [phi]
+                         (let [{:keys [a b]} @!state]
+                           (+ a (* b phi))))
+                       [0, 0] 0  (* 8 Math/PI)]
+             :curveType "polar"
+             :strokewidth 4}]
+    [:glider  {:parents ["c"] :name "g"}]
+    [:tangent {:parents ["g"] :dash 2 :strokeColor "#a612a9"}]
+    [:normal  {:parents ["g"] :dash 2 :strokeColor "#a612a9"}]]))
+
+;; ### Lissajous Curve
+;;
+;; http://jsxgraph.org/wiki/index.php/Lissajous_curves
+;;
+;; https://en.wikipedia.org//wiki/Lissajous_curve
+;;
+;; Lissajous curve (Lissajous figure or Bowditch curve) is the graph of the
+;; system of parametric equations
+;;
+;; $$x=A\sin(at+\delta),\quad y=B\sin(bt).$$
+
+(cljs
+ (reagent/with-let [!state (atom {:a 3 :b 2 :A 3 :B 3 :delta 0})]
+   [jsx/JSXGraph
+    {:boundingbox [-12 10 12 -10]
+     :showCopyright false
+     :keepAspectRatio true
+     :axis true}
+    [:slider {:name "a" :parents [[2,8],[6,8],[0,3,6]]
+              :on {:drag #(swap! !state assoc :a (.Value %))}}]
+    [:slider {:name "b" :parents [[2,7],[6,7],[0,2,6]]
+              :on {:drag #(swap! !state assoc :b (.Value %))}}]
+    [:slider {:name "A" :parents [[2,6],[6,6],[0,3,6]]
+              :on {:drag #(swap! !state assoc :A (.Value %))}}]
+    [:slider {:name "B" :parents [[2,5],[6,5],[0,3,6]]
+              :on {:drag #(swap! !state assoc :B (.Value %))}}]
+    [:slider {:name "&delta;" :parents [[2,4],[6,4],[0,0,Math.PI]]
+              :on {:drag #(swap! !state assoc :delta (.Value %))}}]
+    [:curve
+     {:parents [(fn [t]
+                  (let [{:keys [a A delta]} @!state]
+                    (* A (Math/sin (+ (* a t) delta)))))
+                (fn [t]
+                  (let [{:keys [b B]} @!state]
+                    (* B (Math/sin (* b t)))))
+                0
+                (* 2 Math/PI)]
+      :strokeColor "#aa2233"
+      :strokewidth 3}]]))
+
+;; ### Unit Circle
 ;;
 ;; Here's a more complicated one that does some logic to spit out multiple points.
 
@@ -299,7 +437,8 @@ differences:
  (reagent/with-let [!n    (reagent/atom 6)
                     ->!n #(reset! !n (.Value %))]
    [jsx/JSXGraph {:boundingbox [-1.5 2 1.5 -2]
-                  :showCopyright false}
+                  :showCopyright false
+                  :keepaspectratio true}
     [UnitCircle @!n]
     [jsx/Slider {:name "n"
                  :snapWidth 1
@@ -307,41 +446,9 @@ differences:
                  :parents
                  [[-1 1.5] [1 1.5] [1 @!n 50]]}]]))
 
-;; ## geonext syntax
-;;
-;; I can't find a good reference here... but note this bug https://github.com/jsxgraph/jsxgraph/issues/489
-;;
-;; I think there's a bug where you can't delete then create.
 
-;; TODO uncomment
-#_
-(cljs
- [jsx/JSXGraph {:boundingbox [-5 5 5 -2]
-                :showCopyright false
-                :axis true}
-  [jsx/Point {:name "A"
-              :size 4
-              :parents [1 1]}]
-  [jsx/Point {:name "B"
-              :size 4
-              :parents ["X(A)" 2]}]])
 
-;; ## Basics
-
-;; ### Lines
-
-;; A line needs two points. Lets construct two points "A" and "B". Then we
-;; construct a line through "A" and "B". The setting of a new color and changing
-;; the stroke-width is not necessary.
-
-(cljs
- [jsx/JSXGraph {:boundingbox [-5 5 5 -2] :showCopyright false}
-  [jsx/Point {:name "A" :size 4 :parents [-1 1]}]
-  [jsx/Point {:name "B" :size 4 :parents [2 -1]}]
-  [jsx/Line {:strokeColor "#00ff00" :strokeWidth 2
-             :parents ["A" "B"]}]])
-
-;; ## Data Sharing
+;; ### Riemann Sum
 ;;
 ;; This demo shows how to get the input talking to some state. There are issues
 ;; here that I'll document soon.
@@ -387,7 +494,7 @@ differences:
      [jsx/FunctionGraph {:parents [sin startf endf]}]
      [jsx/RiemannSum {:parents [sin nf "left" startf endf]}]]]))
 
-;; ## 3d
+;; ### 3D
 
 ;; https://jsxgraph.org/docs/symbols/Functiongraph3D.html
 
@@ -415,7 +522,148 @@ differences:
                            :stepsU 70
                            :stepsV 70})))}]))
 
-;; ## SUBTLETIES
+;; ##  JSXGraph vs JSXGraph.cljs
 ;;
-;; If you want to use a Reagent atom you're going to be in trouble and have to
-;; pull out the functions.
+;; We'll start by porting the simple [Circle
+;; example](http://jsxgraph.org/wiki/index.php/Circle) from the [JSXGraph
+;; examples
+;; directory](http://jsxgraph.org/wiki/index.php?title=Category:Examples).
+;;
+;; From the wiki:
+
+;; > One possibility to construct a circle is to give its center and a point
+;; > defining its radius. Lets construct two points "A" and "B". Then we'll
+;; > construct a circle through "A" and "B".
+;;
+;; Given some `div` with `id="jxgbox"`, the following snippet of JS will inject
+;; a `JSXGraph` construction into the `div`:
+
+;; ```js
+;; var b = JXG.JSXGraph.initBoard('jxgbox', {boundingbox: [-5, 2, 5, -2]});
+;; var p1 = b.create('point',[0,0], {name:'A',size: 4, face: 'o'});
+;; var p2 = b.create('point',[2,-1], {name:'B',size: 4, face: 'o'})
+;; var ci = b.createElement('circle',["A","B"], {strokeColor:'#00ff00',strokeWidth:2});
+;; ```
+;;
+;; In `JSXGraph.cljs` we can write that example like this, and see the
+;; construction rendered below. Note that the points are interactive, so drag
+;; them around and watch the circle respond.
+
+(cljs
+ [jsx/JSXGraph {:boundingbox [-5 5 5 -2]
+                :keepAspectRatio true}
+  [:point {:name "A" :size 4 :face "o" :parents [0 0]}]
+  [:point {:name "B" :size 4 :face "o" :parents [2 -1]}]
+  [:circle {:strokeColor "#00ff00" :strokeWidth 2
+            :parents ["A" "B"]}]])
+
+;; When you attempt to port [examples from
+;; JSXGraph.org](http://jsxgraph.org/wiki/index.php?title=Category:Examples),
+;; note the following differences:
+;;
+;; **In JSXGraph:**
+;;
+;; You create a board by calling `initBoard` with the id of some existing `div`
+;; and a map of options.
+;;
+;; New elements are added to a board by calling `board.create(<type-string>
+;;  <parents> <attrs>)`, where
+;;
+;; - `<type-string>`: the lowercase version of one of the classes in the [API
+;;   Reference](https://jsxgraph.org/docs/index.html)
+;;
+;; - `<parents>`: an array of the elements described under each class's "Element
+;;   Detail"
+;;   section. (A [Circle](https://jsxgraph.org/docs/symbols/Circle.html), for
+;;   example, takes two parents: a `Point` for its center, and either a `Point`,
+;;   `Line` or `Circle` for its radial point.)
+;;
+;; - `<attrs>`: a map of attributes described under the class's "Attributes
+;;   Summary" section.
+;;
+;; **In JSXGraph.cljs**
+;;
+;; You create a board by providing a vector of the form `[jsx/JSXGraph
+;; <options-map>]`. The component creates its own `div`. If you want to
+;; customize the div, provide `:id` or `:style` keys.
+;;
+;; To add an element, add a vector of the following form as a child of the
+;; `JSXGraph` component:
+;;
+;; ```
+;; [<class-keyword> {:parents <parents>, <attrs>}]
+;; ```
+;;
+;; Where `<class-keyword>` is the keyword form of the classname (`:circle`,
+;; `:functiongraph` etc), `<parents>` are the parents described above and
+;; `<attrs>` are any other key-value pairs.
+;;
+;; ### Keyword vs Component
+;;
+;; All classes the [JSXGraph API](https://jsxgraph.org/docs/index.html) are
+;; exposed as components
+;; in [`jsxgraph.core`](https://github.com/mentat-collective/jsxgraph.cljs/blob/main/src/jsxgraph/core.cljs#L149).
+;; You can use these components directly in place of the keyword in the example
+;; above:
+
+(cljs
+ [jsx/JSXGraph {:boundingbox [-5 5 5 -2] :showCopyright false}
+  [jsx/Point {:name "A" :size 4 :parents [-1 1]}]
+  [jsx/Point {:name "B" :size 4 :parents [2 -1]}]
+  [jsx/Line {:strokeColor "#00ff00" :strokeWidth 2
+             :parents ["A" "B"]}]])
+
+;; ### Imperative Style
+;;
+;; If you prefer the more imperative style of the original `JSXGraph` library,
+;; or if you need immediate access to an element after you add it to the board,
+;; you can provide a callback to the `jsx/JSXGraph` component using the `:ref`
+;; key and get access to the `board` object.
+;;
+;; Use `jsxgraph.core/create` just like you'd use `board.create` in JavaScript
+;; to add elements.
+;;
+;; > The main advantage here is that you can keep your parent vector and
+;; > attributes map in Clojure.
+
+(cljs
+ [jsx/JSXGraph
+  {:boundingbox [-5 5 5 -2]
+   :style {:height "200px" :width "100%"}
+   :ref (fn [b]
+          ;; `b` will be `nil` when the scene is first created. After the board
+          ;; mounts itself, the `:ref` callback will be called again with the
+          ;; `JSXGraph` instance.
+          (when b
+            (let [p1 (jsx/create b "point" [0 0] {:name "A" :size 4 :face "o"})
+                  p2 (jsx/create b "point" [2 -1] {:name "B" :size 4 :face "o"})]
+              (jsx/create b "line"
+                          ;; Note that we have the actual point instances here and
+                          ;; can add them, instead of relying on the string ID.
+                          [p1 p2]
+                          {:strokeColor "#00ff00" :strokeWidth 2}))))}])
+
+;; ### Accessing Element Values
+;;
+;; A big difference between the `JSXGraph.cljs` and `JSXGraph` versions has to
+;; do with how data is communicated. In JS, you typically create elements and
+;; then query them on demand from other elements.
+
+;; TODO  what else do we want to say here?
+
+;; ## Thanks and Support
+
+;; To support this work and my other open source projects, consider sponsoring
+;; me via my [GitHub Sponsors page](https://github.com/sponsors/sritchie). Thank
+;; you to my current sponsors!
+
+;; I'm grateful to [Clojurists Together](https://www.clojuriststogether.org/)
+;; for financial support during this library's creation. Please
+;; consider [becoming a member](https://www.clojuriststogether.org/developers/)
+;; to support this work and projects like it.
+
+;; ## License
+
+;; Copyright © 2022 Sam Ritchie.
+
+;; Distributed under the [MIT License](LICENSE). See [LICENSE](LICENSE).
