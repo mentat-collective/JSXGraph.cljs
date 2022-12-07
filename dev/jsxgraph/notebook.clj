@@ -7,7 +7,7 @@
 
 ;; # JSXGraph.cljs
 ;;
-;; A light [React](https://reactjs.org/)
+;; A [React](https://reactjs.org/)
 ;; / [Reagent](https://reagent-project.github.io/) interface to
 ;; the [JSXGraph](https://jsxgraph.org/) interactive geometry and mathematics
 ;; library.
@@ -182,10 +182,11 @@
      {:parents ["i1" "i2"]
       :strokeWidth 2
       :strokeColor "#901B77"}]]))
+
 ;; [JSXGraph.cljs](https://github.com/mentat-collective/jsxgraph.cljs) extends
-;; JSXGraph with a [React](https://reactjs.org/)-friendly component that makes
-;; it easy to define JSXGraph constructions inside of a user interface built
-;; with Clojurescript.
+;; JSXGraph with a [Reagent](https://reagent-project.github.io/) component that
+;; makes it easy to define JSXGraph constructions inside of a user interface
+;; built with Clojurescript.
 
 ;; ## Quickstart
 ;;
@@ -217,7 +218,7 @@
 ;; arrow and drag it around by its point:
 
 (cljs
- [jsx/JSXGraph {:boundingbox [-2 2 2 -2]}
+ [jsx/JSXGraph {:boundingbox [-2 2 2 -2] :axis true}
   [jsx/Arrow {:name "A" :size 4
               :parents [[0 0] [1 1]]}]])
 
@@ -229,57 +230,170 @@
 
 ;; > If you're not familiar with React or Reagent, or what a "component" is,
 ;; > please give the [Reagent homepage](https://reagent-project.github.io/) a
-;; > read. If this is your first Clojurescript experience, come say hi to me
-;; > @sritchie in the [Clojurians Slack](http://clojurians.net/) and I'll get
-;; > you started.
+;; > read. If this is your first Clojurescript experience, come say hi to
+;; > me (@sritchie) in the [Clojurians Slack](http://clojurians.net/) and I'll
+;; > get you started.
 
 ;; ## Basics
+
+;; A `JSXGraph` construction consists of a "board" populated by some number of
+;; "elements", where an element is an instance of one of the classes described
+;; in the [JSXGraph API docs](https://jsxgraph.org/docs/index.html).
 ;;
-;; ### Creating a Scene
+;; The [React](https://reactjs.org/)
+;; / [Reagent](https://reagent-project.github.io/) data model is "declarative".
+;; This means that you create and populate a board by listing, in order, the
+;; elements that you want to appear on the board.
 ;;
-;; Declare a scene (or a "board", or "graph") with the `jsx/JSXGraph` component.
+;; ### Your First Board
+;;
+;; Declare a board with the `jsx/JSXGraph` component:
+
+(cljs
+ [jsx/JSXGraph {:axis true}])
+
 ;; The component takes
 ;;
 ;; - a `keyword => value` map of attributes (see the `attributes` section under
 ;;   `Parameters` at [this
 ;;   page](https://jsxgraph.org/docs/symbols/JXG.JSXGraph.html)) for allowed
 ;;   values
-;;
 ;; - Any number of child components.
 ;;
 ;; Child components are added to the board in the order that they're listed. A
 ;; full re-render is triggered any time any of the properties of the board or
 ;; any child component changes.
 ;;
-;; For example, here's a scene with two points and an arrow between them:
+;; For example, here's a board with two `jsx/Point`s and a `jsx/Arrow` between
+;; them:
 
 (cljs
- [jsx/JSXGraph {:boundingbox [-3 3 3 -3]}
+ [jsx/JSXGraph {:boundingbox [-3 3 3 -3] :axis true}
   [jsx/Point {:name "A" :size 1 :parents [-1 1]}]
   [jsx/Point {:id "B" :name "BEE!" :size 1 :parents [2 -1]}]
   [jsx/Arrow {:size 4
               :parents ["A" "B"]}]])
 
-;; Note some details:
+;; Note these details:
 ;;
-;; - The points list initial points on the board as their parents. This leaves
-;;  them free to move! Drag each around.
+;; - The `Point` instances declare their initial coordinates with a vector
+;;  supplied via the `:parents` key. (All elements require parents.) This leaves
+;;  them free to move! Drag each `Point` around and see.
+;; - The `Arrow` sets its `:parents` to points `"A"` and `"B"` using their IDs.
+;;   This creates a constraint, where the `Arrow` can only be moved by moving
+;;   the points.
+;; - The second `Point` has a `:name` different from its `:id`. This allowed us
+;;   to use the `:name` for the second `Point`'s label, and the `:id` for
+;;   reference by `Arrow`.
 ;;
-;; - The `Arrow` lists the IDs of each point as its parents. It's no longer free
-;;   to move, as its position is defined
-;;
-;; - The second point has a name different from its `id`. We did this so that we
-;;   could use one string for a label, and the other as an internal reference
-;;   for the `Arrow`.
+;; You can also refer to elements by their classname, written as either a string or a keyword:
+
+(cljs
+ [jsx/JSXGraph {:boundingbox [-3 3 3 -3] :axis true}
+  [:point {:name "A" :size 1 :parents [-1 1]}]
+  ["point" {:id "B" :name "BEE!" :size 1 :parents [2 -1]}]
+  [:arrow {:size 4
+           :parents ["A" "B"]}]])
+
+;; > Note that this only works if you insert the element as a direct child of a
+;; > `jsx/JSXGraph` component. When writing [Custom
+;; > Components](#Custom%20Components) you'll need to write out the full
+;; > `jsx/<ClassName>` form.
 ;;
 ;; ### Event Listeners
 ;;
-;; TODO go over how to get data out to some atom.
+;; `JSXGraph` elements fire events during various updates and user interactions.
+;; To get data out of the element, pass a map of `{<event-name> <handling-fn>}`
+;; to the element via the `:on` key.
+;;
+;; a `Point` exposes its coordinates
+;; via [`X()`](https://jsxgraph.org/docs/symbols/JXG.CoordsElement.html#X)
+;; and [`Y()`](https://jsxgraph.org/docs/symbols/JXG.CoordsElement.html#X)
+;; methods.
+
+;; This example registers a function that updates a [reactive
+;; atom](https://github.com/reagent-project/reagent/blob/master/doc/ManagingState.md#intro-to-atoms)
+;; `!state` every time the point fires a `"drag"` event, and renders the current
+;; value of `!state` each time it changes.
+;;
+;; Drag the point around and the watch the state update:
+
+(cljs
+ (reagent/with-let
+   [!state  (reagent/atom {:x 0 :y 0})
+    update! (fn [p]
+              (swap! !state assoc
+                     :x (.X p)
+                     :y (.Y p)))]
+   [:<>
+    [:pre (str @!state)]
+    [jsx/JSXGraph {:axis true}
+     [:point
+      {:parents [0 0]
+       :on {:drag update!}}]]]))
+
+;; The lovely thing about this data model is that other parts of your
+;; application outside of `JSXGraph` can read from this state as well.
 ;;
 ;; ### Functions as Parents
 ;;
-;; TODO go over how to bind stuff together
+;; Many `Element` types can take functions as parents. This feature allows you
+;; to bind an `Element`'s coordinate to some external state, like the state
+;; persisted above in `!state`.
 ;;
+;; This example adds a first free `Point` named `"A"`, and a second `Point` with
+;; position constrained to always equal `[cos(A_x), sin(A_y)]`.
+
+(cljs
+ (reagent/with-let
+   [!state  (reagent/atom {:x 0 :y 0})
+    update! (fn [p]
+              (swap! !state assoc
+                     :x (.X p)
+                     :y (.Y p)))
+    cos-x (fn [] (Math/cos (:x @!state)))
+    sin-y (fn [] (Math/sin (:y @!state)))]
+   [:<>
+    [:pre (str @!state)]
+    [jsx/JSXGraph {:axis true}
+     [jsx/Point
+      {:parents [0 0]
+       :name "A"
+       :on {:drag update!}}]
+     [jsx/Point
+      {:parents [cos-x sin-y]
+       :name "[cos A_x, sin A_y]"}]]]))
+
+
+;; > There is a "gotcha" here! If you use a [reactive
+;; > atom](https://github.com/reagent-project/reagent/blob/master/doc/ManagingState.md#intro-to-atoms)
+;; > and access its value somewhere in your component, any change to the atom
+;; > will force the board to re-render.
+;; >
+;; > If you do this you need to be careful to move any functions you want to use
+;; > _outside_ of the component. Otherwise the board will erase and re-mount
+;; > every component every time the atom's value changes.
+
+;; ### GEONExT Syntax
+;;
+;; Another way to declare dependencies between `Element`s is to use "GEONExT
+;; syntax". I can't find good documentation for this anywhere, but its
+;; referenced [here on the `JSXGraph`
+;; wiki](https://jsxgraph.org/wiki/index.php?title=Point#GEONExT_syntax).
+;;
+;; This example adds a first free `Point` named `"A"`, and a second `Point` with
+;; its `Y` coordinate free and its `X` coordinate constrained to always equal
+;; `A_x + A_y`:
+
+(cljs
+ [jsx/JSXGraph {:axis true}
+  [jsx/Point {:name "A" :parents [0 0]}]
+  [jsx/Point {:name "B" :parents ["X(A) + Y(A)" 2]}]])
+
+;; > There is currently [a bug](https://github.com/jsxgraph/jsxgraph/issues/489)
+;; > with this feature, where re-rendering a board will trigger an error. You
+;; > may need to refresh your page if this occurs.
+
 ;; ### Component Refs
 ;;
 ;; TODO sometimes you need access to the actual element...
@@ -295,30 +409,16 @@
            (when p
              (.setName p "Point")))}]])
 
-;; ### Geonext syntax
-;;
-;; I can't find a good reference here... but note this bug https://github.com/jsxgraph/jsxgraph/issues/489
-;;
-;; I think there's a bug where you can't delete then create.
 
-;; TODO uncomment
-#_
-(cljs
- [jsx/JSXGraph {:boundingbox [-5 5 5 -2]
-                :showCopyright false
-                :axis true}
-  [jsx/Point {:name "A"
-              :size 4
-              :parents [1 1]}]
-  [jsx/Point {:name "B"
-              :size 4
-              :parents ["X(A)" 2]}]])
 
 ;; ## Intermediate Usage
+;;
+;; TODO The previous section should get you going! This is more advanced stuff.
 
 ;; ### Custom Components
 ;;
-;; You can use `:<>` to group primitives into a custom component.
+;; You can use `:<>` to group primitives into a custom component. TODO get docs from reagent
+
 (cljs
  (defn Triangle [a b c]
    [:<>
@@ -326,6 +426,8 @@
     [jsx/Point {:name "B" :size 4 :parents b}]
     [jsx/Point {:name "C" :size 4 :parents c}]
     [jsx/Polygon {:parents ["A" "B" "C"]}]]))
+
+;; TODO show syntax.
 
 (cljs
  [jsx/JSXGraph {:boundingbox [-5 5 5 -2]
@@ -335,11 +437,6 @@
    [-1 -1] [1 1] [-1 1]]])
 
 ;; NOTE that we can't use the keyword form here.
-
-;; ### SUBTLETIES
-;;
-;; TODO If you want to use a Reagent atom you're going to be in trouble and have to
-;; pull out the functions.
 
 ;; ## Advanced Examples
 
@@ -631,7 +728,7 @@
   {:boundingbox [-5 5 5 -2]
    :style {:height "200px" :width "100%"}
    :ref (fn [b]
-          ;; `b` will be `nil` when the scene is first created. After the board
+          ;; `b` will be `nil` when the board is first created. After the board
           ;; mounts itself, the `:ref` callback will be called again with the
           ;; `JSXGraph` instance.
           (when b

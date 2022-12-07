@@ -3,7 +3,6 @@
  :builds
  {:clerk
   {:target :browser
-
    :modules
    {:main {:entries
            [nextjournal.clerk.static-app

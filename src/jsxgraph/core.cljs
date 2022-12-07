@@ -71,9 +71,14 @@ to provide any element in `<children>` with access to the bound `board` instance
     (fn [props ref]
       (let [board (react/useContext board-context)
             {:strs [parents] :as props} (js->clj props)
-            props (dissoc props "board" "parents" "force")]
-        ;; TODO error if there are no parents or board, or force. Use this in
+            props (dissoc props "parents")]
+
+        ;; TODO error if there are no parents or board. Use this in
         ;; the context of the jsx!
+        ;;
+        ;; TODO do a warning like mathlive with no board.
+        (when-not parents
+          (throw (js/Error. "No parents! TODO list the class etc")))
 
         (react/useEffect
          (fn mount []
