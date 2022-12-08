@@ -11,10 +11,9 @@ should appear upstream soon and we can back off to the official library.
 
 ## Github Pages, Docs Notebook
 
-The project's [Github Pages
-site](https://mentat-collective.github.io/jsxgraph.cljs) hosts an interactive
-[Clerk](https://github.com/nextjournal/clerk) notebook demonstrating the
-library's use.
+The project's [Github Pages site](https://jsxgraph.mentat.org) hosts an
+interactive [Clerk](https://github.com/nextjournal/clerk) notebook demonstrating
+the library's use.
 
 ### Local Notebook Dev
 
@@ -48,7 +47,7 @@ To build and release to Github Pages:
 bb release-gh-pages
 ```
 
-This will ship the site to https://mentat-collective.github.io/jsxgraph.cljs/.
+This will ship the site to https://jsxgraph.mentat.org.
 
 ## Publishing to Clojars
 

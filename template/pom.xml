@@ -7,7 +7,7 @@
     <artifactId>jsxgraph.cljs</artifactId>
     <name>jsxgraph.cljs</name>
     <description>Clojurescript / Reagent interface for JSXGraph.</description>
-    <url>http://github.com/mentat-collective/jsxgraph.cljs</url>
+    <url>https://jsxgraph.mentat.org</url>
     <licenses>
         <license>
             <name>MIT</name>

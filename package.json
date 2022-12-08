@@ -37,7 +37,7 @@
     "use-sync-external-store": "^1.2.0",
     "w3c-keyname": "2.2.4"
   },
-  "homepage": "https://mentat-collective.github.io/jsxgraph.cljs",
+  "homepage": "https://jsxgraph.mentat.org",
   "scripts": {
     "serve": "http-server -c-1 -o",
     "gh-pages": "gh-pages -d public",

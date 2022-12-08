@@ -504,6 +504,57 @@
   [Triangle*
    [-1 -1] [1 1] [-1 1]]])
 
+;; ### State across Multiple Boards
+;;
+;; [Reagent's state
+;; model](https://github.com/reagent-project/reagent/blob/master/doc/ManagingState.md)
+;; makes it easy to get data out of various elements on the board. Storing state
+;; in an external atom allows you to use state updates from one board to trigger
+;; updates on another board.
+;;
+;; The following example places a free point one board (the parent), and
+;; designates a second board as a child with `addChild`. The second board will
+;; hold a point with location fixed by the first point. Any interaction with the
+;; parent board will trigger updates to every element on the child board.
+
+;; First, our state:
+
+(cljs
+ (defonce !state (atom {:x 1 :y 1})))
+
+;; Then the parent board with its free point. We'll use a `:ref`
+;; function (see [Component Refs](#Component%20Refs)) to perform the [`addChild`
+;; mutation](https://jsxgraph.org/docs/symbols/JXG.Board.html#addChild):
+
+(cljs
+ (let [update! (fn [p]
+                 (swap! !state assoc
+                        :x (.X p)
+                        :y (.Y p)))]
+   [jsx/JSXGraph
+    {:axis true
+     :style {:height "300px"}
+     :ref (fn [b]
+            (when b (swap! !state assoc :board b)))}
+    [jsx/Point {:on {:drag update!}
+                :parents [(:x @!state) (:y @!state)]}]]))
+
+;; The child board will call `addChild` in its `:ref` function. Note that the
+;; parents of the second point are no-argument functions that access the `:x`
+;; and `:y` coordinates stored in `!state`. (The next example is folded so you
+;; can see both boards at once. Click "show code" to unfold.)
+
+^{:nextjournal.clerk/visibility {:code :fold}}
+(cljs
+ [jsx/JSXGraph
+  {:axis true
+   :style {:height "300px"}
+   :ref (fn [b]
+          (when b
+            (.addChild (:board @!state) b)))}
+  [jsx/Point {:parents
+              [#(:x @!state) #(:y @!state)]}]])
+
 ;; ## Advanced Examples
 ;;
 ;; This section explores `JSXGraph` by porting a few of the more complex
@@ -704,7 +755,7 @@
 ;; will let other components access the state.
 
 (cljs
- (defonce !state
+ (defonce !r-state
    (reagent/atom
     {:start -3 :end (* 2 Math/PI) :n 10})))
 
@@ -713,13 +764,13 @@
 
 (cljs
  (reagent/with-let
-   [init         @!state
-    start-update #(swap! !state assoc :start (.Value %))
-    end-update   #(swap! !state assoc :end (.Value %))
-    n-update     #(swap! !state assoc :n (.Value %))
-    nf           #(:n @!state)
-    startf       #(:start @!state)
-    endf         #(:end @!state)
+   [init         @!r-state
+    start-update #(swap! !r-state assoc :start (.Value %))
+    end-update   #(swap! !r-state assoc :end (.Value %))
+    n-update     #(swap! !r-state assoc :n (.Value %))
+    nf           #(:n @!r-state)
+    startf       #(:start @!r-state)
+    endf         #(:end @!r-state)
     sin          #(Math/sin %)]
    [jsx/JSXGraph
     {:boundingbox [-8 4 8 -5]
@@ -745,31 +796,31 @@
       ;; from our text below.
       :ref (fn [elem]
              (when elem
-               (swap! !state assoc :riemann elem)))}]
+               (swap! !r-state assoc :riemann elem)))}]
 
     ;; Graph the actual function.
     [jsx/FunctionGraph {:parents [sin startf endf]}]
     [jsx/Text
      {:parents
       [-3.5 3 (fn []
-                (let [v (.Value (:riemann @!state))]
+                (let [v (.Value (:riemann @!r-state))]
                   (str "Riemann Sum: "
                        (.toFixed v 4))))]}]
     [jsx/Text
      {:parents
       [-3.5 2.5 (fn []
-                  (let [{:keys [start end]} @!state]
+                  (let [{:keys [start end]} @!r-state]
                     (str "Actual Integral: "
                          (-> (- (- (Math/cos end))
                                 (- (Math/cos start)))
                              (.toFixed 4)))))]}]]))
 
 ;; Because we stored our state outside of a `let` binding, we can query it from
-;; other components, and they'll re-render on any update to `!state`. Change the
+;; other components, and they'll re-render on any update to `!r-state`. Change the
 ;; sliders above and watch these values change:
 
 (cljs
- [:pre (str (dissoc @!state :riemann))])
+ [:pre (str (dissoc @!r-state :riemann))])
 
 ;; ### Vector Field
 ;;
@@ -853,33 +904,56 @@
 
 ;; ### 3D Views
 ;;
-;; https://jsxgraph.uni-bayreuth.de/wp/2022-05-27-release-of-version-1.4.4/
+;; As of [version
+;; 1.4.4](https://jsxgraph.uni-bayreuth.de/wp/2022-05-27-release-of-version-1.4.4/),
+;; JSXGraph has support for 3d views.
 ;;
-;; This is more "experimental" at this phase, and breaks the abstraction here a
-;; bit.
+;; Unlike all other elements, 3d elements must be added as children of a
+;; `view3d` element.
+
+;; > `JSXGraph.cljs` doesn't currently support adding children to `jsx/View3D`,
+;; > but we will! Follow [this
+;; > ticket](https://github.com/mentat-collective/jsxgraph.cljs/issues/23) for
+;; > updates.
 ;;
-;; TODO file a ticket for views etc on this repo, and a ticket
-
-;; https://jsxgraph.org/docs/symbols/Functiongraph3D.html
-
-;; https://github.com/mentat-collective/jsxgraph.cljs/issues/23
+;; The allowed 3D elements are:
+;;
+;; - [Curve3D](https://jsxgraph.org/docs/symbols/Curve3D.html)
+;; - [FunctionGraph3D](https://jsxgraph.org/docs/symbols/Functiongraph3D.html)
+;; - [Line3D](https://jsxgraph.org/docs/symbols/Line3D.html)
+;; - [ParametricSurface3D](https://jsxgraph.org/docs/symbols/ParametricSurface3D.html)
+;; - [Point3D](https://jsxgraph.org/docs/symbols/Point3D.html)
+;;
+;; To instantiate a 3D scene with `JSXGraph.cljs`, you'll need to use
+;; the [Imperative Style](#Imperative%20Style) described below to create your
+;; view and 3D elements directly on the `board` instance.
+;;
+;; The following example is a port of the demo listed under
+;; the [`FunctionGraph3D` API
+;; entry](https://jsxgraph.org/docs/symbols/Functiongraph3D.html). The plot
+;; shows the surface defined by the equation
+;;
+;; $$F(x, y) = \sin\left(\frac{xy}{4}\right).$$
 
 (cljs
  (let [box [-5 5]
-       F  (fn [x y] (Math/sin (* x (/ y 4))))]
+       F   (fn [x y]
+             (Math/sin (* x (/ y 4))))]
    [jsx/JSXGraph
     {:boundingbox [-8 8 8 -8]
      :showCopyright false
      :axis false
      :showNavigation false
      :ref (fn [b]
+            ;; First, create a `view3d` object on the board `b`.
             (let [view
                   (jsx/create b "view3d"
                               [[-6 -3] [8 8]
                                [box box box]]
                               {:xPlaneRear {:visible false}
                                :yPlaneRear {:visible false}})]
-              ;; note that we create this on the VIEW, not on the board.
+              ;; Note that we create any 3d elements on `view`, not on the board
+              ;; `b`.
               (jsx/create view "functiongraph3d"
                           [F box box]
                           {:strokeWidth 0.5
@@ -888,21 +962,18 @@
 
 ;; ##  JSXGraph vs JSXGraph.cljs
 ;;
-;; TODO give some context here.
+;; This section discusses differences between the [React](https://reactjs.org/)
+;; / [Reagent](https://reagent-project.github.io/)-based interface provided by
+;; `JSXGraph.cljs` and the imperative JavaScript API presented by the
+;; original [`JSXGraph`](http://jsxgraph.org/) library.
 ;;
-;; We'll start by porting the simple [Circle
+;; Let's compare two implementations of the [Circle
 ;; example](http://jsxgraph.org/wiki/index.php/Circle) from the [JSXGraph
 ;; examples
 ;; directory](http://jsxgraph.org/wiki/index.php?title=Category:Examples).
 ;;
-;; From the wiki:
-
-;; > One possibility to construct a circle is to give its center and a point
-;; > defining its radius. Lets construct two points "A" and "B". Then we'll
-;; > construct a circle through "A" and "B".
-;;
-;; Given some `div` with `id="jxgbox"`, the following snippet of JS will inject
-;; a `JSXGraph` construction into the `div`:
+;; Given some `div` with `id="jxgbox"`, the following snippet of JavaScript will
+;; inject a `JSXGraph` construction into the `div`:
 
 ;; ```js
 ;; var b = JXG.JSXGraph.initBoard('jxgbox', {boundingbox: [-5, 2, 5, -2]});
@@ -910,10 +981,8 @@
 ;; var p2 = b.create('point',[2,-1], {name:'B',size: 4, face: 'o'})
 ;; var ci = b.createElement('circle',["A","B"], {strokeColor:'#00ff00',strokeWidth:2});
 ;; ```
-;;
-;; In `JSXGraph.cljs` we can write that example like this, and see the
-;; construction rendered below. Note that the points are interactive, so drag
-;; them around and watch the circle respond.
+
+;; In `JSXGraph.cljs` we can write the example like this:
 
 (cljs
  [jsx/JSXGraph {:boundingbox [-5 5 5 -2]
@@ -923,9 +992,7 @@
   [:circle {:strokeColor "#00ff00" :strokeWidth 2
             :parents ["A" "B"]}]])
 
-;; When you attempt to port [examples from
-;; JSXGraph.org](http://jsxgraph.org/wiki/index.php?title=Category:Examples),
-;; note the following differences:
+;; Note the following differences:
 ;;
 ;; **In JSXGraph:**
 ;;
@@ -987,10 +1054,7 @@
 ;; key and get access to the `board` object.
 ;;
 ;; Use `jsxgraph.core/create` just like you'd use `board.create` in JavaScript
-;; to add elements.
-;;
-;; > The main advantage here is that you can keep your parent vector and
-;; > attributes map in Clojure.
+;; to add elements:
 
 (cljs
  [jsx/JSXGraph
@@ -1014,8 +1078,15 @@
 ;; A big difference between the `JSXGraph.cljs` and `JSXGraph` versions has to
 ;; do with how data is communicated. In JS, you typically create elements and
 ;; then query them on demand from other elements.
-
-;; TODO  what else do we want to say here? Refer to the guides above now.
+;;
+;; In `JSXGraph.cljs`, elements communicate via updates to a shared `atom` or
+;; `reagent/atom`. Many of the examples in the [Guides](#Guides) and [Advanced
+;; Examples](#Advanced%20Examples) above use this style, so please study these
+;; carefully.
+;;
+;; > See [Reagent's guide to
+;; > state](https://github.com/reagent-project/reagent/blob/master/doc/ManagingState.md)
+;; > for more detail.
 
 ;; ## Thanks and Support
 
@@ -1032,6 +1103,6 @@
 
 ;; Copyright © 2022 Sam Ritchie.
 
-;; TODO fix license links.
-
-;; Distributed under the [MIT License](LICENSE). See [LICENSE](LICENSE).
+;; Distributed under the [MIT
+;; License](https://github.com/mentat-collective/jsxgraph.cljs/blob/main/LICENSE).
+;; See [LICENSE](https://github.com/mentat-collective/jsxgraph.cljs/blob/main/LICENSE).
