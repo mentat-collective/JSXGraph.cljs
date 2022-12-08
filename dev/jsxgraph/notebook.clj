@@ -234,7 +234,7 @@
 ;; > me (@sritchie) in the [Clojurians Slack](http://clojurians.net/) and I'll
 ;; > get you started.
 
-;; ## Basics
+;; ## Guides
 
 ;; A `JSXGraph` construction consists of a "board" populated by some number of
 ;; "elements", where an element is an instance of one of the classes described
@@ -245,7 +245,7 @@
 ;; This means that you create and populate a board by listing, in order, the
 ;; elements that you want to appear on the board.
 ;;
-;; ### Your First Board
+;; ### Creating Your First Board
 ;;
 ;; Declare a board with the `jsx/JSXGraph` component:
 
@@ -396,28 +396,70 @@
 
 ;; ### Component Refs
 ;;
-;; TODO sometimes you need access to the actual element...
+;; If you need access to the actual instance of a `JSXGraph` element, pass a
+;; callback function using the `:ref` keyword. The `:ref` function receives an
+;; instance of the element when it is mounted, and `nil` when the board is
+;; destroyed or the element is remounted.
 
 (cljs
- [jsx/JSXGraph {:boundingbox [-5 5 5 -2]
-                :showCopyright false
-                :axis true}
+ [jsx/JSXGraph {:axis true}
   [:point
-   {:size 4
-    :parents [1 1]
+   {:parents [1 1]
     :ref (fn [p]
            (when p
-             (.setName p "Point")))}]])
+             (.setName p "NAME!")))}]])
 
-
-
-;; ## Intermediate Usage
+;; You might use this feature to store a reference to some element that doesn't
+;; fire its own events, so that you can query its value when some other element
+;; fires.
 ;;
-;; TODO The previous section should get you going! This is more advanced stuff.
+;; The `RiemannSum` element has this property. The example below uses `:ref` to
+;; store a reference to the `RiemannSum`, so that the `Text` element in the
+;; bottom left of the scene can query it inside its parent function. See the
+;; inline comments for more detail.
+
+(cljs
+ (let [!state (atom {:slider 4 :riemann nil})
+       f      (fn [x]
+                ;; 1/2 x^2 - 2x
+                (- (* 0.5 x x)
+                   (* 2 x)))]
+   [jsx/JSXGraph {:boundingbox [-3 7 5 -3]
+                  :axis true}
+    [jsx/Slider
+     {:parents [[0 4] [3 4] [0 (:slider @!state) 10]]
+      :on {:drag #(swap! !state assoc :slider (.Value %))}}]
+    [jsx/RiemannSum
+     {:parents [f #(:slider @!state) "middle" -2 5]
+      :fillOpacity 0.4
+      ;; When this element mounts, a reference to the `RiemannSum` instance is
+      ;; stored under the `:riemann` key in the `!state` atom.
+      :ref (fn [elem]
+             (when elem
+               (swap! !state assoc :riemann elem)))}]
+    [jsx/FunctionGraph
+     {:parents [f -2 5]}]
+    [jsx/Text
+     {:parents [-2 -2 (fn []
+                        ;; The `:riemann` key has been populated by the time the
+                        ;; `Text` component is mounted, so we don't need to
+                        ;; guard against a `nil` value here.
+                        (let [v (.Value (:riemann @!state))]
+                          (str "Sum: " (.toFixed v 4))))]}]]))
 
 ;; ### Custom Components
 ;;
-;; You can use `:<>` to group primitives into a custom component. TODO get docs from reagent
+;; If you want to reuse some pattern in your board declaration, you can create a
+;; new Reagent component that bundles together a sequence of primitives,
+;; possibly closing over some state that these elements need.
+;;
+;; > See the [Reagent Component
+;; > Guide](https://github.com/reagent-project/reagent/blob/master/doc/CreatingReagentComponents.md#the-three-ways)
+;; > for more detail.
+;;
+;; Create a component by writing a function that takes some number of arguments
+;; and returns a vector of the form `[:<> <any-number-of-elements>]`. Here is a
+;; component that accepts 3 vertex point definitions and creates a triangle:
 
 (cljs
  (defn Triangle [a b c]
@@ -427,135 +469,247 @@
     [jsx/Point {:name "C" :size 4 :parents c}]
     [jsx/Polygon {:parents ["A" "B" "C"]}]]))
 
-;; TODO show syntax.
+;; Use your component by including a vector of the form `[ComponentName
+;; <arguments>]` as a child if your `JSXGraph` component;
 
 (cljs
- [jsx/JSXGraph {:boundingbox [-5 5 5 -2]
-                :showCopyright false
-                :axis true}
+ [jsx/JSXGraph {:axis true}
   [Triangle
    [-1 -1] [1 1] [-1 1]]])
 
-;; NOTE that we can't use the keyword form here.
+;; You can abstract this example further by writing your own version of a
+;; `Polygon` element that takes a map of ID => a point's `:parents` entry:
+
+(cljs
+ (defn MyPolygon [id->parents]
+   (let [ids (into [] (keys id->parents))
+         points (for [[id parents] id->parents]
+                  [jsx/Point {:name id :parents parents}])]
+     ;; Build [:<> ...points...], then add `[jsx/Polygon ...]` to the end of the
+     ;; list.
+     (-> (into [:<>] points)
+         (conj [jsx/Polygon {:parents ids}])))))
+
+;; Re-define a version of `Triangle` that uses `MyPolygon`:
+
+(cljs
+ (defn Triangle* [a b c]
+   [MyPolygon {:A a :B b :C c}]))
+
+;; These elements should look exactly the same as the previous `Triangle`
+;; definition:
+
+(cljs
+ [jsx/JSXGraph {:axis true}
+  [Triangle*
+   [-1 -1] [1 1] [-1 1]]])
 
 ;; ## Advanced Examples
+;;
+;; This section explores `JSXGraph` by porting a few of the more complex
+;; examples from the [Example
+;; directory](http://jsxgraph.org/wp/about/index.html) and inventing a few of
+;; our own constructions.
 
 ;; ### Archimedean Spiral
 
-;; Here's a more complex example; an interactive exploration of the [Archimedean
-;; Spiral](https://en.wikipedia.org/wiki/Archimedean_spiral).
-
-;; http://jsxgraph.org/wiki/index.php/Archimedean_spiral
-
+;; This example allows for interactive exploration of the [Archimedean
+;; Spiral](https://en.wikipedia.org/wiki/Archimedean_spiral). This is a curve of
+;; the form
+;;
+;; $$r=a + b \cdot \theta.$$
+;;
+;; The board below includes interactive sliders for the $a$ and $b$ parameters,
+;; and plots a polar curve for every pair of $(r, \theta)$. See the comments in
+;; the source code for details on our choices.
+;;
+;; > The original example lives at [this
+;; > page](http://jsxgraph.org/wiki/index.php/Archimedean_spiral).
 
 (cljs
- (reagent/with-let [!state (atom {:a 1 :b 0.25})]
+ ;; The `!state` atom is populated with the initial slider positions. Note that
+ ;; we are NOT using a `reagent/atom`, because we don't need Reagent to perform
+ ;; any re-renders when the state changes. Instead, state changes are picked up
+ ;; by the function we provide to the curve below.
+ (let [!state (atom {:a 1 :b 0.25})]
    [jsx/JSXGraph
     {:boundingbox [-10 10 10 -10]
      :showCopyright false
+     ;; This option prevents the spiral from bulging out on the left and right
+     ;; side on wider windows by adjusting the provided `:boundingBox`.
      :keepAspectRatio true}
-    [:slider {:name "a"
-              :parents [[1 8] [5 8] [0 (:a @!state) 4]]
-              :on {:drag #(swap! !state assoc :a (.Value %))}}]
-    [:slider {:name "b"
-              :parents [[1 9] [5 9] [0 (:b @!state) 4]]
-              :on {:drag #(swap! !state assoc :b (.Value %))}}]
-    [:curve {:id "c"
-             :parents [(fn [phi]
-                         (let [{:keys [a b]} @!state]
-                           (+ a (* b phi))))
-                       [0, 0] 0  (* 8 Math/PI)]
-             :curveType "polar"
-             :strokewidth 4}]
+
+    ;; Just for fun we are using the keyword form here to define components.
+    [:slider
+     {:name "a"
+      ;; The `:parents` are of the form
+      ;;
+      ;; [<left-point> <right-point> [<min> <current> <max>]]
+      :parents [[1 8] [5 8] [0 (:a @!state) 4]]
+
+      ;; Each slider updates a value stored in `!state` above.
+      :on {:drag #(swap! !state assoc :a (.Value %))}}]
+    [:slider
+     {:name "b"
+      :parents [[1 9] [5 9] [0 (:b @!state) 4]]
+      :on {:drag #(swap! !state assoc :b (.Value %))}}]
+    [:curve
+     {:id "c"
+      ;; [<r(phi)>, <origin-coords>, <min-phi>, <max-phi>]
+      :parents [(fn [phi]
+                  (let [{:keys [a b]} @!state]
+                    (+ a (* b phi))))
+                [0 0] 0 (* 8 Math/PI)]
+      :curveType "polar"
+      :strokewidth 4}]
+    ;; Note here that the parents of these elements reference the string-based
+    ;; IDs of the element they want to target, instead of the actual
+    ;; instance (like in the original example)
     [:glider  {:parents ["c"] :name "g"}]
     [:tangent {:parents ["g"] :dash 2 :strokeColor "#a612a9"}]
     [:normal  {:parents ["g"] :dash 2 :strokeColor "#a612a9"}]]))
 
 ;; ### Lissajous Curve
 ;;
-;; http://jsxgraph.org/wiki/index.php/Lissajous_curves
+;; From the [Wikipedia page](https://en.wikipedia.org//wiki/Lissajous_curve),
+
+;; > A Lissajous curve (also known as a Lissajous figure or Bowditch curve) is
+;; > the graph of a system of parametric equations
+;; >
+;; > $$x=A\sin(at+\delta),\quad y=B\sin(bt).$$
+;; >
+;; > which describe [complex harmonic
+;; > motion](https://en.wikipedia.org/wiki/Complex_harmonic_motion).
 ;;
-;; https://en.wikipedia.org//wiki/Lissajous_curve
-;;
-;; Lissajous curve (Lissajous figure or Bowditch curve) is the graph of the
-;; system of parametric equations
-;;
-;; $$x=A\sin(at+\delta),\quad y=B\sin(bt).$$
+;; The board below includes interactive sliders for the $a$, $b$, $A$ and $B$
+;; parameters, and plots a parametric curve for every pair of $(x y)$.
+
+;; The original example lives at [this
+;; page](http://jsxgraph.org/wiki/index.php/Lissajous_curves).
 
 (cljs
- (reagent/with-let [!state (atom {:a 3 :b 2 :A 3 :B 3 :delta 0})]
+ (let [!state (atom {:a 3 :b 2 :A 3 :B 3 :delta 0})]
    [jsx/JSXGraph
-    {:boundingbox [-12 10 12 -10]
+    {:boundingbox [-8 8 8 -8]
      :showCopyright false
      :keepAspectRatio true
      :axis true}
-    [:slider {:name "a" :parents [[2,8],[6,8],[0,3,6]]
-              :on {:drag #(swap! !state assoc :a (.Value %))}}]
-    [:slider {:name "b" :parents [[2,7],[6,7],[0,2,6]]
-              :on {:drag #(swap! !state assoc :b (.Value %))}}]
-    [:slider {:name "A" :parents [[2,6],[6,6],[0,3,6]]
-              :on {:drag #(swap! !state assoc :A (.Value %))}}]
-    [:slider {:name "B" :parents [[2,5],[6,5],[0,3,6]]
-              :on {:drag #(swap! !state assoc :B (.Value %))}}]
-    [:slider {:name "&delta;" :parents [[2,4],[6,4],[0,0,Math.PI]]
-              :on {:drag #(swap! !state assoc :delta (.Value %))}}]
+    ;; Interactive Sliders
+    [:slider
+     {:name "a" :parents [[2,8],[6,8],[0,3,6]]
+      :on {:drag #(swap! !state assoc :a (.Value %))}}]
+    [:slider
+     {:name "b" :parents [[2,7],[6,7],[0,2,6]]
+      :on {:drag #(swap! !state assoc :b (.Value %))}}]
+    [:slider
+     {:name "A" :parents [[2,6],[6,6],[0,3,6]]
+      :on {:drag #(swap! !state assoc :A (.Value %))}}]
+    [:slider
+     {:name "B" :parents [[2,5],[6,5],[0,3,6]]
+      :on {:drag #(swap! !state assoc :B (.Value %))}}]
+    [:slider
+     {:name "&delta;" :parents [[2,4],[6,4],[0,0,Math.PI]]
+      :on {:drag #(swap! !state assoc :delta (.Value %))}}]
+
+    ;; The Curve!
     [:curve
-     {:parents [(fn [t]
-                  (let [{:keys [a A delta]} @!state]
-                    (* A (Math/sin (+ (* a t) delta)))))
-                (fn [t]
-                  (let [{:keys [b B]} @!state]
-                    (* B (Math/sin (* b t)))))
-                0
-                (* 2 Math/PI)]
+     {:parents
+      ;; [<x-fn>, <y-fn>, <min-t>, <max-y>]
+      [(fn [t]
+         (let [{:keys [a A delta]} @!state]
+           (* A (Math/sin (+ (* a t) delta)))))
+       (fn [t]
+         (let [{:keys [b B]} @!state]
+           (* B (Math/sin (* b t)))))
+       0
+       (* 2 Math/PI)]
       :strokeColor "#aa2233"
       :strokewidth 3}]]))
 
 ;; ### Unit Circle
 ;;
-;; Here's a more complicated one that does some logic to spit out multiple points.
+;; This example uses a custom Reagent component `UnitCircle` to inscribe a
+;; polygon of `n` points into the unit circle. `UnitCircle` is similar to the
+;; `MyPolygon` implementation above in [Custom
+;; Components](#Custom%20Components), but generates its own point coordinates
+;; internally.
+;;
+;; The component below also shows off a case where we _do_ need to use a
+;; `reagent/atom`.
 
 (cljs
  (defn UnitCircle [n]
-   (let [ids (vec (range n))]
+   (let [ids (range n)
+         i->pt (fn [i]
+                 (let [angle (* (/ i n) 2 Math/PI)
+                       x (Math/cos angle)
+                       y (Math/sin angle)]
+                   [jsx/Point
+                    {:name i :size 5 :parents [x y]}]))]
      [:<>
-      (into [:<>]
-            (map
-             (fn [i]
-               (let [angle (* (/ i n) 2 Math/PI)
-                     x (Math/cos angle)
-                     y (Math/sin angle)]
-                 [jsx/Point {:name i :size 5 :parents [x y]}])))
-            ids)
-      [jsx/Polygon {:parents (mapv str ids)
-                    :borders {:strokeColor "black"}}]])))
+      (into [:<>] (map i->pt) ids)
+      [jsx/Polygon
+       {:parents (mapv str ids)
+        :borders {:strokeColor "black"}}]])))
+
+;; The board below instantiates the `UnitCircle` component using an `n` that
+;; comes from an interactive slider.
+;;
+;; To bind the state, we
+;;
+;; - use `reagent/with-let` instead of `let`
+;; - `reagent/atom` instead of `atom`
+;;
+;; Doing this will force any component that dereferences `!state` to re-render.
+;; This is what we want! We want a change in the `n` slider to trigger the
+;; drawing of a new `UnitCircle`, vs previous examples where we wanted to send
+;; new information to elements that had rendered a single time on the board.
+;;
+;; Drag the slider around and note the slight flicker as the board redraws.
 
 (cljs
- (reagent/with-let [!n    (reagent/atom 6)
-                    ->!n #(reset! !n (.Value %))]
-   [jsx/JSXGraph {:boundingbox [-1.5 2 1.5 -2]
-                  :showCopyright false
-                  :keepaspectratio true}
+ (reagent/with-let
+   [!n    (reagent/atom 6)
+    ->!n #(reset! !n (.Value %))]
+   [jsx/JSXGraph
+    {:boundingbox [-1.5 2 1.5 -2]
+     :showCopyright false
+     :keepAspectRatio true}
+    ;; Any time `!n` is updated by the `->!n` function provided to the slider
+    ;; below, this component AND the `jsx/Slider` will re-render.
     [UnitCircle @!n]
-    [jsx/Slider {:name "n"
-                 :snapWidth 1
-                 :on {:drag ->!n}
-                 :parents
-                 [[-1 1.5] [1 1.5] [1 @!n 50]]}]]))
-
-
+    [jsx/Slider
+     {:name "n"
+      :snapWidth 1
+      :on {:drag ->!n}
+      :parents
+      [[-1 1.5] [1 1.5] [1 @!n 50]]}]]))
 
 ;; ### Riemann Sum
 ;;
-;; This demo shows how to get the input talking to some state. There are issues
-;; here that I'll document soon.
+;; A [Riemann Sum](https://en.wikipedia.org/wiki/Riemann_sum) is an
+;; approximation of the integral of a function (the area under its curve). You
+;; generate rectangles whose heights are determined by the values of the
+;; function, and add up the rectangles to obtain your approximation. Chopping
+;; the area into more rectangles gives a better estimate.
+;;
+;; This example plots $\sin(x)$ along with a visual representation of a Riemann
+;; sum. The board contains sliders to change the left and right bounds of the
+;; function, as well as the number of rectangles in the (middle) Riemann sum.
+;;
+;; > The original example lives at [this
+;; > page](https://jsxgraph.org/wiki/index.php/Riemann_sums).
+
+;; First we'll create our `!state` outside of the `reagent/with-let` block. This
+;; will let other components access the state.
 
 (cljs
  (defonce !state
-   (atom
+   (reagent/atom
     {:start -3 :end (* 2 Math/PI) :n 10})))
 
-;; And the example:
+;; The board uses `reagent/with-let`; this will prevent the dereference calls
+;; inside the bindings from triggering a component re-render.
 
 (cljs
  (reagent/with-let
@@ -567,31 +721,144 @@
     startf       #(:start @!state)
     endf         #(:end @!state)
     sin          #(Math/sin %)]
-   [:<>
-    [:pre (str @!state)]
-    [jsx/JSXGraph {:boundingbox [-8 4 8 -5]
-                   :showCopyright false
-                   :axis true}
+   [jsx/JSXGraph
+    {:boundingbox [-8 4 8 -5]
+     :showCopyright false
+     :axis true}
+    [jsx/Slider {:name "start"
+                 :on {:drag start-update}
+                 :parents
+                 [[1 3.5] [5 3.5] [-10 (:start init) 0]]}]
+    [jsx/Slider {:name "end"
+                 :on {:drag end-update}
+                 :parents
+                 [[1 2.5] [5 2.5] [0 (:end init) 10]]}]
+    [jsx/Slider {:name "n"
+                 :snapWidth 1
+                 :on {:drag n-update}
+                 :parents
+                 [[1 1.5] [5 1.5] [1 (:n init) 100]]}]
 
-     [jsx/Slider {:name "start"
-                  :on {:drag start-update}
-                  :parents
-                  [[1 3.5] [5 3.5] [-10 (:start init) 0]]}]
-     [jsx/Slider {:name "end"
-                  :on {:drag end-update}
-                  :parents
-                  [[1 2.5] [5 2.5] [0 (:end init) 10]]}]
+    [jsx/RiemannSum
+     {:parents [sin nf "middle" startf endf]
+      ;; Store a reference to the `RiemannSum` instance so that we can query it
+      ;; from our text below.
+      :ref (fn [elem]
+             (when elem
+               (swap! !state assoc :riemann elem)))}]
 
-     [jsx/Slider {:name "n"
-                  :snapWidth 1
-                  :on {:drag n-update}
-                  :parents
-                  [[1 1.5] [5 1.5] [1 (:n init) 50]]}]
+    ;; Graph the actual function.
+    [jsx/FunctionGraph {:parents [sin startf endf]}]
+    [jsx/Text
+     {:parents
+      [-3.5 3 (fn []
+                (let [v (.Value (:riemann @!state))]
+                  (str "Riemann Sum: "
+                       (.toFixed v 4))))]}]
+    [jsx/Text
+     {:parents
+      [-3.5 2.5 (fn []
+                  (let [{:keys [start end]} @!state]
+                    (str "Actual Integral: "
+                         (-> (- (- (Math/cos end))
+                                (- (Math/cos start)))
+                             (.toFixed 4)))))]}]]))
 
-     [jsx/FunctionGraph {:parents [sin startf endf]}]
-     [jsx/RiemannSum {:parents [sin nf "left" startf endf]}]]]))
+;; Because we stored our state outside of a `let` binding, we can query it from
+;; other components, and they'll re-render on any update to `!state`. Change the
+;; sliders above and watch these values change:
 
-;; ### 3D
+(cljs
+ [:pre (str (dissoc @!state :riemann))])
+
+;; ### Vector Field
+;;
+;; I found this lovely animation of an interactive vector field over
+;; at [mafs.dev](https://mafs.dev/guides/display/vector-fields/), and had to
+;; implement the example here in `JSXGraph.cljs`.
+;;
+;; This [vector field](https://en.wikipedia.org/wiki/Vector_field) example
+;; assigns a vector, in this case a small arrow with a constant magnitude equal
+;; to the value provided via `:scale`, to each point on a 2-dimensional grid.
+;; The `:dimensions` options takes a 2-vector of the form `[<x-steps>,
+;; <y-steps>]`
+;;
+;; The `:coords-fn` option takes a pair of `[x y]` coordinates and returns the
+;; tip `[x', y']` of a new vector. This will generate a vector on the grid
+;; starting at `[x y]` and pointing at the same angle $\theta$ as the new
+;; vector.
+;;
+;; `:opacity-fn` takes the coordinates of the base of the vector and returns its
+;; opacity.
+
+(cljs
+ (defn VectorField
+   [{:keys [dimensions coords-fn opacity-fn scale]
+     :or {scale 1
+          dimensions [5 5]}}]
+   (let [f (fn [x y]
+             (let [[x' y'] (coords-fn x y)
+                   theta   (Math/atan2 y' x')]
+               ;; Calculate the angle, then scale and translate the new vector's
+               ;; end to the appropriate point.
+               (js/Array.
+                (+ x (* scale (Math/cos theta)))
+                (+ y (* scale (Math/sin theta))))))
+         [nx ny] dimensions]
+     (into [:<>]
+           (for [x (range nx)
+                 y (range ny)
+                 :let [x (- x (/ nx 2))
+                       y (- y (/ ny 2))]]
+             ;; We generate a `jsx/Line` vs a `jsx/Arrow` to have some more
+             ;; control over the arrowhead via the `:lastArrow` key below.
+             [jsx/Line
+              {:parents [#(js/Array. x y) #(f x y)]
+               :straightFirst false
+               :lastArrow {:type 1 :size 4}
+               :straightLast false
+               :strokeOpacity
+               (opacity-fn x y)}])))))
+
+;; Now that we have the `VectorField`, we can use our tricks from above to
+;; customize the `VectorField`'s vector values based on the position of a
+;; moveable `Point` in the scene. Drag the point around!
+
+(cljs
+ (let [!coords (atom {:x 0.6 :y 0.6})
+       update! (fn [p]
+                 (swap! !coords assoc
+                        :x (.X p)
+                        :y (.Y p)))]
+   [jsx/JSXGraph
+    {:boundingbox [-6 6 6 -6]
+     :axis true
+     :grid true
+     :showNavigation false
+     :keepAspectRatio true}
+    [jsx/Point {:parents [(:x @!coords)
+                          (:y @!coords)]
+                :on {:drag update!}}]
+    [VectorField
+     {:dimensions [20 14]
+      :scale 0.5
+      :coords-fn
+      (fn [x y]
+        (let [{px :x py :y} @!coords]
+          [(- y py (- x px))
+           (- (- px x) (- y py))]))
+      :opacity-fn
+      (fn [x y]
+        (/ (+ (Math/abs x) (Math/abs y)) 10))}]]))
+
+;; ### 3D Views
+;;
+;; https://jsxgraph.uni-bayreuth.de/wp/2022-05-27-release-of-version-1.4.4/
+;;
+;; This is more "experimental" at this phase, and breaks the abstraction here a
+;; bit.
+;;
+;; TODO file a ticket for views etc on this repo, and a ticket
 
 ;; https://jsxgraph.org/docs/symbols/Functiongraph3D.html
 
@@ -620,6 +887,8 @@
                            :stepsV 70})))}]))
 
 ;; ##  JSXGraph vs JSXGraph.cljs
+;;
+;; TODO give some context here.
 ;;
 ;; We'll start by porting the simple [Circle
 ;; example](http://jsxgraph.org/wiki/index.php/Circle) from the [JSXGraph
@@ -746,7 +1015,7 @@
 ;; do with how data is communicated. In JS, you typically create elements and
 ;; then query them on demand from other elements.
 
-;; TODO  what else do we want to say here?
+;; TODO  what else do we want to say here? Refer to the guides above now.
 
 ;; ## Thanks and Support
 
@@ -762,5 +1031,7 @@
 ;; ## License
 
 ;; Copyright © 2022 Sam Ritchie.
+
+;; TODO fix license links.
 
 ;; Distributed under the [MIT License](LICENSE). See [LICENSE](LICENSE).
