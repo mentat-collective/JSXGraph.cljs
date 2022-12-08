@@ -1098,6 +1098,8 @@
 ;; for financial support during this library's creation. Please
 ;; consider [becoming a member](https://www.clojuriststogether.org/developers/)
 ;; to support this work and projects like it.
+;;
+;; For more information on me and my work, visit https://samritchie.io.
 
 ;; ## License
 
