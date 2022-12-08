@@ -1,4 +1,4 @@
-{:deps {:aliases [:dev :clerk]}
+{:deps {:aliases [:dev :nextjournal/clerk]}
  :dev-http {8765 "public"}
  :builds
  {:clerk
@@ -11,6 +11,8 @@
             jsxgraph.clerk-ui]}}
    :output-dir "public/js"
    :asset-path "/js"
+   :build-options
+   {:ns-aliases {nextjournal.devcards nextjournal.devcards-noop}}
    :compiler-options
    {:infer-externs :auto
     :optimizations :advanced}}}}
