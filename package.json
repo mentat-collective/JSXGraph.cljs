@@ -39,7 +39,7 @@
   "homepage": "https://jsxgraph.mentat.org",
   "scripts": {
     "serve": "http-server -c-1 -o",
-    "gh-pages": "gh-pages -d public",
+    "gh-pages": "gh-pages -d public --dotfiles true",
     "watch-clerk": "shadow-cljs watch clerk",
     "release-clerk": "shadow-cljs release clerk"
   }

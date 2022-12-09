@@ -29,6 +29,8 @@
       :out-path "public"})))
 
 (defn garden! [_]
-  (sh "npm" "install")
+  (println "Installing...")
+  (println
+   (sh "npm" "install"))
   (shadow/release! :clerk)
   (github-pages!))
