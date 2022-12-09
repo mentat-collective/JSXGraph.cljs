@@ -29,7 +29,7 @@
       :out-path "public"})))
 
 (defn garden! [_]
-  (println "Installing...")
+  (println "Running npm install...")
   (println
    (sh "npm" "install"))
   (shadow/release! :clerk)

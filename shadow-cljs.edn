@@ -11,10 +11,10 @@
 
    :compiler-options
    {:infer-externs :auto
-    :optimizations :advanced
-    :source-map true}
+    :optimizations :advanced}
    :modules {:main
              {:entries
               [nextjournal.clerk.static-app
                jsxgraph.clerk-ui]}}
-   :js-options {:output-feature-set :es8}}}}
+   :js-options
+   {:output-feature-set :es8}}}}
