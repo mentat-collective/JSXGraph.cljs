@@ -1283,8 +1283,9 @@ to provide any element in `<children>` with access to the bound `board` instance
                       (.substr 2 9)))
         style (or style {:height "400px" :width "100%"})
         kill! (fn [board props]
-                (.suspendUpdate board)
-                (-> (.-JSXGraph jsx) (.freeBoard board))
+                (when (.-renderer board)
+                  (.suspendUpdate board)
+                  (-> (.-JSXGraph jsx) (.freeBoard board)))
                 (when-let [ref (:ref props)]
                   (ref nil))
                 nil)

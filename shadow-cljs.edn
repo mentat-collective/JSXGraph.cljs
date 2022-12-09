@@ -2,17 +2,19 @@
  :dev-http {8765 "public"}
  :builds
  {:clerk
-  {:target :browser
-   :modules
-   {:main {:entries
-           [nextjournal.clerk.static-app
-            nextjournal.viewer.notebook
-            nextjournal.clerk.sci-viewer
-            jsxgraph.clerk-ui]}}
+  {:target :esm
+   :runtime :browser
    :output-dir "public/js"
-   :asset-path "/js"
    :build-options
-   {:ns-aliases {nextjournal.devcards nextjournal.devcards-noop}}
+   {:ns-aliases
+    {nextjournal.devcards nextjournal.devcards-noop}}
+
    :compiler-options
    {:infer-externs :auto
-    :optimizations :advanced}}}}
+    :optimizations :advanced
+    :source-map true}
+   :modules {:main
+             {:entries
+              [nextjournal.clerk.static-app
+               jsxgraph.clerk-ui]}}
+   :js-options {:output-feature-set :es8}}}}

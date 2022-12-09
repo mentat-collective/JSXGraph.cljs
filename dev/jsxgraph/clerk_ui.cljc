@@ -1,8 +1,11 @@
 (ns jsxgraph.clerk-ui
-  (:require #?(:cljs [jsxgraph.core])
-            #?(:clj  [nextjournal.clerk :as clerk])
-            #?(:cljs [nextjournal.clerk.sci-viewer :as sv])
-            #?(:cljs [sci.core :as sci]))
+  (:require #?@(:clj
+                [[nextjournal.clerk :as clerk]]
+                :cljs
+                [[jsxgraph.core]
+                 [nextjournal.clerk.sci-env]
+                 [sci.ctx-store]
+                 [sci.core :as sci]]))
   #?(:cljs
      (:require-macros [jsxgraph.clerk-ui])))
 
@@ -12,13 +15,13 @@
 ;; library's CLJS code in the Clerk notebooks that document the library.
 
 #?(:cljs
-   (swap! sv/!sci-ctx
-          sci/merge-opts
-          {:classes    {'Math js/Math}
-           :aliases    {'jsx 'jsxgraph.core}
-           :namespaces
-           {'jsxgraph.core
-            (sci/copy-ns jsxgraph.core (sci/create-ns 'jsxgraph.core))}}))
+   (sci.ctx-store/swap-ctx!
+    sci/merge-opts
+    {:classes    {'Math js/Math}
+     :aliases    {'jsx 'jsxgraph.core}
+     :namespaces
+     {'jsxgraph.core
+      (sci/copy-ns jsxgraph.core (sci/create-ns 'jsxgraph.core))}}))
 
 ;; ## Example Macro
 
@@ -29,7 +32,8 @@
          :render-fn '(fn [_#]
                        (let [result# (do ~@exprs)]
                          (v/html
-                          (if (vector? result#)
+                          (if (and (vector? result#)
+                                   (not (:inspect (meta result#))))
                             result#
                             [v/inspect result#]))))}
         {})))
