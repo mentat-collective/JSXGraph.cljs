@@ -520,7 +520,7 @@
 ;; First, our state:
 
 (cljs
- (defonce !p-state
+ (defonce !state
    (atom {:x 1 :y 1})))
 
 ;; Then the parent board with its free point. We'll use a `:ref`
@@ -529,32 +529,32 @@
 
 (cljs
  (let [update! (fn [p]
-                 (swap! !p-state assoc
+                 (swap! !state assoc
                         :x (.X p)
                         :y (.Y p)))]
    [jsx/JSXGraph
     {:axis true
      :style {:height "300px"}
      :ref (fn [b]
-            (when b (swap! !p-state assoc :board b)))}
+            (when b (swap! !state assoc :board b)))}
     [jsx/Point {:on {:drag update!}
-                :parents [(:x @!p-state) (:y @!p-state)]}]]))
+                :parents [(:x @!state) (:y @!state)]}]]))
 
 ;; The child board will call `addChild` in its `:ref` function. Note that the
 ;; parents of the second point are no-argument functions that access the `:x`
-;; and `:y` coordinates stored in `!p-state`. (The next example is folded so you
+;; and `:y` coordinates stored in `!state`. (The next example is folded so you
 ;; can see both boards at once. Click "show code" to unfold.)
 
-#_#_^{:nextjournal.clerk/visibility {:code :fold}}
+^{:nextjournal.clerk/visibility {:code :fold}}
 (cljs
  [jsx/JSXGraph
   {:axis true
    :style {:height "300px"}
    :ref (fn [b]
           (when b
-            (.addChild (:board @!p-state) b)))}
+            (.addChild (:board @!state) b)))}
   [jsx/Point {:parents
-              [#(:x @!p-state) #(:y @!p-state)]}]])
+              [#(:x @!state) #(:y @!state)]}]])
 
 ;; ## Advanced Examples
 ;;
