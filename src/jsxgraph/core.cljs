@@ -87,12 +87,13 @@ to provide any element in `<children>` with access to the bound `board` instance
          (fn mount []
            ;; sometimes a stale dead board is passed in; in this case the
            ;; `-renderer` property is nil, so we guard against that.
-           (when (and board (.-renderer board))
+           (if (and board (.-renderer board))
              (let [item (create board element-type parents props)]
                (when ref (ref item))
                (fn unmount []
                  (when board (.removeObject board item))
-                 (when ref (ref nil)))))))
+                 (when ref (ref nil))))
+             (fn []))))
         nil)))))
 
 ;; ## Elements
@@ -1283,8 +1284,9 @@ to provide any element in `<children>` with access to the bound `board` instance
                       (.substr 2 9)))
         style (or style {:height "400px" :width "100%"})
         kill! (fn [board props]
-                (.suspendUpdate board)
-                (-> (.-JSXGraph jsx) (.freeBoard board))
+                (when (.-renderer board)
+                  (.suspendUpdate board)
+                  (-> (.-JSXGraph jsx) (.freeBoard board)))
                 (when-let [ref (:ref props)]
                   (ref nil))
                 nil)
