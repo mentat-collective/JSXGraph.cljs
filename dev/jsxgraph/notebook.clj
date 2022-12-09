@@ -520,7 +520,8 @@
 ;; First, our state:
 
 (cljs
- (defonce !state (atom {:x 1 :y 1})))
+ (defonce !p-state
+   (atom {:x 1 :y 1})))
 
 ;; Then the parent board with its free point. We'll use a `:ref`
 ;; function (see [Component Refs](#Component%20Refs)) to perform the [`addChild`
@@ -528,32 +529,32 @@
 
 (cljs
  (let [update! (fn [p]
-                 (swap! !state assoc
+                 (swap! !p-state assoc
                         :x (.X p)
                         :y (.Y p)))]
    [jsx/JSXGraph
     {:axis true
      :style {:height "300px"}
      :ref (fn [b]
-            (when b (swap! !state assoc :board b)))}
+            (when b (swap! !p-state assoc :board b)))}
     [jsx/Point {:on {:drag update!}
-                :parents [(:x @!state) (:y @!state)]}]]))
+                :parents [(:x @!p-state) (:y @!p-state)]}]]))
 
 ;; The child board will call `addChild` in its `:ref` function. Note that the
 ;; parents of the second point are no-argument functions that access the `:x`
-;; and `:y` coordinates stored in `!state`. (The next example is folded so you
+;; and `:y` coordinates stored in `!p-state`. (The next example is folded so you
 ;; can see both boards at once. Click "show code" to unfold.)
 
-^{:nextjournal.clerk/visibility {:code :fold}}
+#_#_^{:nextjournal.clerk/visibility {:code :fold}}
 (cljs
  [jsx/JSXGraph
   {:axis true
    :style {:height "300px"}
    :ref (fn [b]
           (when b
-            (.addChild (:board @!state) b)))}
+            (.addChild (:board @!p-state) b)))}
   [jsx/Point {:parents
-              [#(:x @!state) #(:y @!state)]}]])
+              [#(:x @!p-state) #(:y @!p-state)]}]])
 
 ;; ## Advanced Examples
 ;;
@@ -945,20 +946,21 @@
      :axis false
      :showNavigation false
      :ref (fn [b]
-            ;; First, create a `view3d` object on the board `b`.
-            (let [view
-                  (jsx/create b "view3d"
-                              [[-6 -3] [8 8]
-                               [box box box]]
-                              {:xPlaneRear {:visible false}
-                               :yPlaneRear {:visible false}})]
-              ;; Note that we create any 3d elements on `view`, not on the board
-              ;; `b`.
-              (jsx/create view "functiongraph3d"
-                          [F box box]
-                          {:strokeWidth 0.5
-                           :stepsU 70
-                           :stepsV 70})))}]))
+            (when b
+              ;; First, create a `view3d` object on the board `b`.
+              (let [view
+                    (jsx/create b "view3d"
+                                [[-6 -3] [8 8]
+                                 [box box box]]
+                                {:xPlaneRear {:visible false}
+                                 :yPlaneRear {:visible false}})]
+                ;; Note that we create any 3d elements on `view`, not on the board
+                ;; `b`.
+                (jsx/create view "functiongraph3d"
+                            [F box box]
+                            {:strokeWidth 0.5
+                             :stepsU 70
+                             :stepsV 70}))))}]))
 
 ;; ##  JSXGraph vs JSXGraph.cljs
 ;;
