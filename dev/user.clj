@@ -17,20 +17,19 @@
   (Thread/sleep 500)
   (clerk/show! "dev/jsxgraph/notebook.clj"))
 
-(defn github-pages! [& _]
+(defn github-pages! [{:keys [out-path]
+                      :or {out-path "public"}
+                      :as opts}]
   (let [cas (cv/store+get-cas-url!
-             {:out-path "public/js" :ext "js"}
+             {:out-path (str out-path "/js") :ext "js"}
              (fs/read-all-bytes "public/js/main.js"))]
     (swap! config/!resource->url assoc "/js/viewer.js" (str "/js/" cas))
     (clerk/build!
-     {:index "dev/jsxgraph/notebook.clj"
-      :bundle? false
-      :browse? false
-      :out-path "public"})))
+     (merge {:index "dev/jsxgraph/notebook.clj"} opts))))
 
-(defn garden! [_]
+(defn garden! [opts]
   (println "Running npm install...")
   (println
-   (sh "npm" "install"))
+   (sh "npm" "install" "--verbose"))
   (shadow/release! :clerk)
-  (github-pages!))
+  (github-pages! opts))
