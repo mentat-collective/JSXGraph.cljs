@@ -15,6 +15,7 @@
     "@lezer/lr": "1.2.5",
     "@mentatcollective/jsxgraph": "1.5.1",
     "@nextjournal/lang-clojure": "1.0.0",
+    "canvas": "^2.10.2",
     "d3-require": "1.3.0",
     "emoji-regex": "10.2.1",
     "framer-motion": "7.6.19",
