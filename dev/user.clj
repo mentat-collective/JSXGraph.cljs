@@ -30,6 +30,6 @@
 (defn garden! [opts]
   (println "Running npm install...")
   (println
-   (sh "npm" "install" "--verbose"))
+   (sh "npm" "install"))
   (shadow/release! :clerk)
   (github-pages! opts))

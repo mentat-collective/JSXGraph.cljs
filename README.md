@@ -49,6 +49,10 @@ Here's a more complex example of an interactive vector field, implemented
 See the project's [interactive documentation
 notebook](https://jsxgraph.mentat.org) for more guides and examples.
 
+## Canvas Dependency
+
+TODO add docs https://github.com/Automattic/node-canvas#compiling
+
 ## Interactive Documentation via Clerk
 
 The project's [interactive documentation](https://jsxgraph.mentat.org) was
