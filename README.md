@@ -51,7 +51,15 @@ notebook](https://jsxgraph.mentat.org) for more guides and examples.
 
 ## Canvas Dependency
 
-TODO add docs https://github.com/Automattic/node-canvas#compiling
+The [JSXGraph NPM package](https://www.npmjs.com/package/jsxgraph) depends on
+the [canvas](https://www.npmjs.com/package/canvas) package.
+[canvas](https://www.npmjs.com/package/canvas) comes with many pre-built
+binaries, but if you're running on a non-supported OS or processor architecture
+NPM may try to compile this dependency from source.
+
+If you run into trouble, [see the `canvas` docs page on
+compilation](https://github.com/Automattic/node-canvas#compiling) for
+instructions on how to install the dependencies for this process.
 
 ## Interactive Documentation via Clerk
 
