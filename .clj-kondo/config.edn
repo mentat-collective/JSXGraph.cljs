@@ -1,5 +1,1 @@
-{:config-in-call
- ;; for now ignore everything. TODO get this form to emit only cljs, no clj?
- {jsxgraph.clerk-ui/cljs
-  {:linters {:unresolved-symbol {:level :off}
-             :unresolved-namespace {:level :off}}}}}
+{}
