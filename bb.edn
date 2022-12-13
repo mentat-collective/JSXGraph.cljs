@@ -20,10 +20,15 @@
       (shell "npm run release-clerk")
       (shell "clojure -X:dev:nextjournal/clerk user/github-pages!")
       (run 'sha)
-      (spit "./public/CNAME" "jsxgraph.mentat.org"))
+      (spit "./public/CNAME" "jsxgraph.mentat.org")
+
+      ;; This is necessary for folders with underscores to work, like the one
+      ;; that Clerk uses to store data for its CAS.
+      (spit "./public/.nojekyll" ""))
 
   release-gh-pages
-  (do (run 'publish-gh-pages)
+  (do (shell "rm -rf public")
+      (run 'publish-gh-pages)
       (shell "npm run gh-pages"))
 
   publish-local
