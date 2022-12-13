@@ -28,6 +28,7 @@
         cas (cv/store+get-cas-url!
              {:out-path (str out-path "/js") :ext "js"}
              (fs/read-all-bytes "public/js/main.js"))]
+    ;; TODO make a change here so we don't have an invalid absolute path on garden.
     (swap! config/!resource->url assoc "/js/viewer.js" (str "/js/" cas))
     (clerk/build!
      (merge {:index index}
