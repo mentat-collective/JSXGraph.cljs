@@ -3,7 +3,7 @@
  :no-cache true
  :visibility :hide-ns}
 (ns jsxgraph.notebook
-  (:require [jsxgraph.clerk-ui :refer [cljs]]))
+  (:require [mentat.clerk-utils :refer [cljs]]))
 
 ;; # JSXGraph.cljs
 ;;

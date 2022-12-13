@@ -30,7 +30,7 @@
              (fs/read-all-bytes "public/js/main.js"))]
     (swap! config/!resource->url assoc "/js/viewer.js" (str "/js/" cas))
     (clerk/build!
-     (merge {:index "dev/jsxgraph/notebook.clj"}
+     (merge {:index index}
             (assoc opts :out-path out-path)))))
 
 (defn garden! [opts]
