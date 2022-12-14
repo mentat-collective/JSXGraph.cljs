@@ -2,6 +2,11 @@
 
 ## [unreleased]
 
+- #29:
+
+  - Fixes `user.clj` and `bb.edn` to work with Garden.
+  - Adds docstrings to all `bb tasks`. Run `bb tasks` to see these.
+
 - #24:
 
   - Upgrade to the latest Clerk version. This pulls us along to React v18.
