@@ -11,11 +11,19 @@
 (def index
   "dev/jsxgraph/notebook.clj")
 
-(def defaults
+(def ^{:doc "static site defaults for local and github-pages modes."}
+  defaults
   {:out-path   "public"
    :cas-prefix "/"})
 
-(defn start! []
+(def ^{:doc "static site defaults for Clerk's Garden CDN."}
+  garden-defaults
+  {:cas-prefix "/mentat-collective/jsxgraph.cljs/commit/$GIT_SHA/"})
+
+(defn start!
+  "Runs [[clerk/serve!]] with our custom JS. Run this after generating custom JS
+  with shadow in either production or `watch` mode."
+  []
   (swap! config/!resource->url
          assoc
          "/js/viewer.js" "http://localhost:8765/js/main.js")
@@ -26,7 +34,8 @@
   (clerk/show! index))
 
 (defn replace-sha-template!
-  "Replaces $GIT_SHA with the sha."
+  "Given some `path`, modifies the file at `path` replaces any occurence of the
+  string `$GIT_SHA` with the actual current sha of the repo."
   [path]
   (let [sha (-> (sh "git" "rev-parse" "HEAD")
                 (:out)
@@ -35,7 +44,26 @@
         (clojure.string/replace "$GIT_SHA" sha)
         (->> (spit path)))))
 
-(defn github-pages! [opts]
+(defn static-build!
+  "This task is used to generate static sites for local use, github pages
+  deployment and Clerk's Garden CDN.
+
+  Accepts a map of options `opts` and runs the following tasks:
+
+  - Slurps the output of the shadow-cljs `:clerk` build from `public/js/main.js`
+    and pushes it into a CAS located at `(str (:out-path opts) \"/js/_data\")`.
+
+  - Configures Clerk to generate files that load the js from the generated name
+    above, stored in `(str (:cas-prefix opts) \"/js/_data\")`
+
+  - Creates a static build of the single namespace [[index]] at `(str (:out-path
+    opts) \"/index.html\")`
+
+  - Replaces all instances of the string $GIT_SHA in `index.html` with the
+    actual sha of the library.
+
+  All `opts` are forwarded to [[nextjournal.clerk/build!]]."
+  [opts]
   (let [{:keys [out-path cas-prefix]} (merge defaults opts)
         cas (cv/store+get-cas-url!
              {:out-path (str out-path "/js") :ext "js"}
@@ -49,9 +77,14 @@
     (replace-sha-template!
      (str out-path "/index.html"))))
 
-(defn garden! [opts]
+(defn garden!
+  "Standalone executable function that runs [[static-build!]] configured for
+  Clerk's Garden. See [[garden-defaults]] for customizations
+  to [[static-build!]]."
+  [opts]
   (println "Running npm install...")
   (println
    (sh "npm" "install"))
   (shadow/release! :clerk)
-  (github-pages! opts))
+  (static-build!
+   (merge garden-defaults opts)))
