@@ -1,14 +1,5 @@
 {:tasks
- {sha
-  (let [sha (-> (shell {:out :string} "git rev-parse HEAD")
-                (:out)
-                (clojure.string/trim))
-        file "public/index.html"]
-    (-> (slurp file)
-        (clojure.string/replace "$GIT_SHA" sha)
-        (->> (spit file))))
-
-  dev-notebook
+ {dev-notebook
   (do (shell "npm install")
       (shell "npm run watch-clerk"))
 
@@ -18,8 +9,9 @@
   publish-gh-pages
   (do (shell "npm ci")
       (shell "npm run release-clerk")
-      (shell "clojure -X:dev:nextjournal/clerk user/github-pages!")
-      (run 'sha)
+      (apply shell
+             "clojure -X:dev:nextjournal/clerk user/github-pages!"
+             *command-line-args*)
       (spit "./public/CNAME" "jsxgraph.mentat.org")
 
       ;; This is necessary for folders with underscores to work, like the one

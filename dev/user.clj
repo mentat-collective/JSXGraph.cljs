@@ -1,6 +1,7 @@
 (ns user
   (:require [babashka.fs :as fs]
             [clojure.java.shell :refer [sh]]
+            [clojure.string]
             [nextjournal.clerk :as clerk]
             [nextjournal.clerk.config :as config]
             [nextjournal.clerk.view]
@@ -11,7 +12,8 @@
   "dev/jsxgraph/notebook.clj")
 
 (def defaults
-  {:out-path "public"})
+  {:out-path   "public"
+   :cas-prefix "/"})
 
 (defn start! []
   (swap! config/!resource->url
@@ -23,16 +25,29 @@
   (Thread/sleep 500)
   (clerk/show! index))
 
+(defn replace-sha-template!
+  "Replaces $GIT_SHA with the sha."
+  [path]
+  (let [sha (-> (sh "git" "rev-parse" "HEAD")
+                (:out)
+                (clojure.string/trim))]
+    (-> (slurp path)
+        (clojure.string/replace "$GIT_SHA" sha)
+        (->> (spit path)))))
+
 (defn github-pages! [opts]
-  (let [{:keys [out-path]} (merge defaults opts)
+  (let [{:keys [out-path cas-prefix]} (merge defaults opts)
         cas (cv/store+get-cas-url!
              {:out-path (str out-path "/js") :ext "js"}
              (fs/read-all-bytes "public/js/main.js"))]
-    ;; TODO make a change here so we don't have an invalid absolute path on garden.
-    (swap! config/!resource->url assoc "/js/viewer.js" (str "/js/" cas))
+    (swap! config/!resource->url assoc
+           "/js/viewer.js"
+           (str cas-prefix "js/" cas))
     (clerk/build!
      (merge {:index index}
-            (assoc opts :out-path out-path)))))
+            (assoc opts :out-path out-path)))
+    (replace-sha-template!
+     (str out-path "/index.html"))))
 
 (defn garden! [opts]
   (println "Running npm install...")

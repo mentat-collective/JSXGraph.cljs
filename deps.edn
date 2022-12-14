@@ -18,7 +18,9 @@
      :git/sha "75f073c4899e37b2259cb2057cbf863b90892897"
      :deps/root "render"}
     org.mentat/clerk-utils {:mvn/version "0.0.1"}}
-   :exec-fn user/garden!}
+   :exec-fn user/garden!
+   :exec-args
+   {:cas-prefix "/mentat-collective/jsxgraph.cljs/commit/$GIT_SHA/"}}
 
   :build
   {:deps {io.github.clojure/tools.build {:git/tag "v0.8.2" :git/sha "ba1a2bf"}
