@@ -93,7 +93,7 @@ to provide any element in `<children>` with access to the bound `board` instance
                (fn unmount []
                  (when board (.removeObject board item))
                  (when ref (ref nil))))
-             (fn []))))
+             js/undefined)))
         nil)))))
 
 ;; ## Elements
