@@ -1,5 +1,7 @@
-{:tasks
- {dev-notebook
+{:pods {clj-kondo/clj-kondo {:version "2022.12.10"}}
+ :tasks
+ {:requires ([pod.borkdude.clj-kondo :as clj-kondo])
+  dev-notebook
   {:doc "Start a shadow-cljs watch process that generates this project's custom JS."
    :task
    (do (shell "npm install")
@@ -44,4 +46,5 @@
 
   lint
   {:doc "Lint the src and dev directories with clj-kondo."
-   :task (shell "clj-kondo --lint src:dev")}}}
+   :task (clj-kondo/print!
+          (clj-kondo/run! {:lint ["src" "dev"]}))}}}
