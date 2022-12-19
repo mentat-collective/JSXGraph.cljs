@@ -200,7 +200,7 @@
 ;;
 ;; ```clj
 ;; ;; deps
-;; {org.mentat/jsxgraph.cljs
+;; {io.github.mentat-collective/jsxgraph.cljs
 ;;   {:git/sha "$GIT_SHA"}}
 ;; ```
 
