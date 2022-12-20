@@ -1,7 +1,7 @@
 (ns jsxgraph.core
   "React/Reagent implementation of a component that exposes the API from
   http://jsxgraph.org/ in a more declarative way."
-  (:require ["@mentatcollective/jsxgraph$default" :as jsx]
+  (:require ["jsxgraph$default" :as jsx]
             [reagent.core :as re]
             ["react" :as react]))
 
