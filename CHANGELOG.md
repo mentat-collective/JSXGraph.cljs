@@ -2,6 +2,8 @@
 
 ## [unreleased]
 
+- #31 moves the library to the official JSXGraph 1.5.0 release, off of the mentat-collective fork.
+
 - #29:
 
   - Fixes `user.clj` and `bb.edn` to work with Garden.
