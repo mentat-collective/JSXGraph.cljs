@@ -2,6 +2,10 @@
 
 ## [unreleased]
 
+- #next:
+
+  - fixes issue where id must start with a letter
+
 - #31 moves the library to the official JSXGraph 1.5.0 release, off of the
   mentat-collective fork.
 
