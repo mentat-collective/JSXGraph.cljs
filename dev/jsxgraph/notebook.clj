@@ -217,6 +217,18 @@
 ;;             [reagent.core :as reagent]))
 ;; ```
 ;;
+;; You'll also need to include the stylesheets that ship with `jsxgraph`. If
+;; you're using Clerk
+;; and [`clerk-utils`](https://github.com/mentat-collective/clerk-utils), add
+;; this form to `dev/user.clj`:
+
+;; ```clj
+;; (mentat.clerk-utils.css/set-css!
+;;  "https://cdn.jsdelivr.net/npm/jsxgraph@1.5.0/distrib/jsxgraph.css")
+;; ```
+;;
+;; Otherwise find some way to load this CSS file in your project's header.
+;;
 ;; The main entrypoint to the library is the `jsxgraph.core/JSXGraph` component.
 ;; Each class in the [JSXGraph API](https://jsxgraph.org/docs/index.html) has a
 ;; corresponding component bound as `jsx/ClassName`. Use these to build a simple
@@ -560,6 +572,83 @@
             (.addChild (:board @!state) b)))}
   [jsx/Point {:parents
               [#(:x @!state) #(:y @!state)]}]])
+
+;; ## JSXGraph.cljs via SCI
+;;
+;; `JSXGraph.cljs` is compatible with [SCI, the Small Clojure
+;; Interpreter](https://github.com/babashka/sci).
+;;
+;; To install `JSXGraph.cljs` into your SCI context, require
+;; the [`jsxgraph.sci`](https://cljdoc.org/d/org.mentat/jsxgraph.cljs/CURRENT/api/jsxgraph.sci)
+;; namespace and call `jsxgraph.sci/install!`:
+
+;; ```clj
+;; (ns myproject.sci-extensions
+;;   (:require [jsxgraph.sci]))
+
+;; (jsxgraph.sci/install!)
+;; ```
+;;
+;; If you want more granular control, see the [cljdoc page for
+;; `jsxgraph.sci`](https://cljdoc.org/d/org.mentat/jsxgraph.cljs/CURRENT/api/jsxgraph.sci)
+;; for an SCI config and distinct SCI namespace objects that you can piece
+;; together.
+;;
+;; > Note that `JSXGraph.cljs` does not ship with a dependency on SCI, so you'll
+;; > need to install your own version.
+;;
+;; ## JSXGraph.cljs via Clerk
+;;
+;; Using `JSXGraph.cljs` with Nextjournal's [Clerk](https://clerk.vision/) gives
+;; you the ability to write notebooks like this one with embedded JSXGraph
+;; constructions.
+;;
+;; Doing this requires that you generate a custom ClojureScript build for your
+;; Clerk project. The easiest way to do this for an existing project is with
+;; the [`clerk-utils` project](https://clerk-utils.mentat.org/). Follow the
+;; instructions on the [`clerk-utils` guide for custom
+;; ClojureScript](https://clerk-utils.mentat.org/#custom-clojurescript-builds).
+;;
+;; If this is your first time using Clerk, use the [`jsxgraph/clerk` template
+;; described below](#project-template) to generate a new project with all steps
+;; described in ["JSXGraph.cljs via SCI"](#jsxgraph.cljs-via-sci) already
+;; completed.
+
+;; ## Project Template
+;;
+;; `JSXGraph.cljs` includes
+;; a [`deps-new`](https://github.com/seancorfield/deps-new) template called
+;; [`jsxgraph/clerk`](https://github.com/mentat-collective/jsxgraph.cljs/tree/main/resources/jsxgraph/clerk)
+;; that makes it easy to configure a new Clerk project with everything described
+;; in ["JSXGraph.cljs via SCI"](#jsxgraph.cljs-via-sci) already configured.
+
+;; First, install the [`deps-new`](https://github.com/seancorfield/deps-new) tool:
+
+;; ```sh
+;; clojure -Ttools install io.github.seancorfield/deps-new '{:git/tag "v0.4.13"}' :as new
+;; ```
+
+;; To create a new Clerk project based on
+;; [`jsxgraph/clerk`](https://github.com/mentat-collective/jsxgraph.cljs/tree/main/resources/jsxgraph/clerk)
+;; in a folder called `my-notebook-project`, run the following command:
+
+^{::clerk/visibility {:code :hide}}
+(clerk/md
+ (format "
+```sh
+clojure -Sdeps '{:deps {io.github.mentat-collective/jsxgraph.cljs {:git/sha \"%s\"}}}' \\
+-Tnew create \\
+:template jsxgraph/clerk \\
+:name myusername/my-notebook-project
+```" (docs/git-sha)))
+
+;; The `README.md` file in the generated project contains information on how to
+;; develop within the new project.
+
+;; If you have an existing Clerk notebook project and are considering adding
+;; `JSXGraph.cljs`, you might consider
+;; using [`jsxgraph/clerk`](https://github.com/mentat-collective/mafs.cljs/tree/main/resources/mafs/clerk)
+;; to get some ideas on how to structure your own project.
 
 ;; ## Advanced Examples
 ;;
