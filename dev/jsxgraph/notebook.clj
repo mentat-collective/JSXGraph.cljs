@@ -647,7 +647,7 @@ clojure -Sdeps '{:deps {io.github.mentat-collective/jsxgraph.cljs {:git/sha \"%s
 
 ;; If you have an existing Clerk notebook project and are considering adding
 ;; `JSXGraph.cljs`, you might consider
-;; using [`jsxgraph/clerk`](https://github.com/mentat-collective/mafs.cljs/tree/main/resources/mafs/clerk)
+;; using [`jsxgraph/clerk`](https://github.com/mentat-collective/jsxgraph.cljs/tree/main/resources/jsxgraph/clerk)
 ;; to get some ideas on how to structure your own project.
 
 ;; ## Advanced Examples
