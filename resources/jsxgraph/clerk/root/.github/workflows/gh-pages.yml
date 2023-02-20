@@ -10,7 +10,10 @@ jobs:
     steps:
       - uses: actions/cache@v3
         with:
-          path: ~/.m2
+          path: |
+            .cpcache
+            .shadow-cljs
+            ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/deps.edn') }}
           restore-keys: ${{ runner.os }}-m2
 

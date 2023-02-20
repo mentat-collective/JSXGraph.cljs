@@ -1,7 +1,7 @@
 (ns jsxgraph.core
   "React/Reagent implementation of a component that exposes the API from
   http://jsxgraph.org/ in a more declarative way."
-  (:require ["jsxgraph$default" :as jsx]
+  (:require ["jsxgraph" :as jsx]
             [reagent.core :as re]
             ["react" :as react]))
 
@@ -1279,20 +1279,19 @@ to provide any element in `<children>` with access to the bound `board` instance
   destroyed or remounted."
   [{:keys [id style]} & _]
   (let [!board    (re/atom nil)
-        id (or id (-> (Math/random)
-                      (.toString 36)
-                      (.substr 2 9)))
+        id (or id (str "id" (-> (Math/random)
+                                (.toString 36)
+                                (.substr 2 9))))
         style (or style {:height "400px" :width "100%"})
         kill! (fn [board props]
                 (when (.-renderer board)
                   (.suspendUpdate board)
-                  (-> (.-JSXGraph jsx) (.freeBoard board)))
+                  (.freeBoard jsx/JSXGraph board))
                 (when-let [ref (:ref props)]
                   (ref nil))
                 nil)
         init! (fn [props]
-                (let [board (-> (.-JSXGraph jsx)
-                                (.initBoard id (clj->js props)))]
+                (let [board (.initBoard jsx/JSXGraph id (clj->js props))]
                   (when-let [ref (:ref props)]
                     (ref board))
                   board))]

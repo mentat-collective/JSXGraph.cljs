@@ -3,7 +3,15 @@
  :no-cache true
  :visibility :hide-ns}
 (ns jsxgraph.notebook
-  (:require [mentat.clerk-utils :refer [cljs]]))
+  (:require [mentat.clerk-utils.docs :as docs]
+            [mentat.clerk-utils.show :refer [show-sci]]
+            [nextjournal.clerk :as clerk]))
+
+^{::clerk/visibility {:code :hide :result :hide}}
+(clerk/eval-cljs
+ ;; These aliases only apply inside this namespace.
+ '(require '[jsxgraph.core :as jsx])
+ '(require '[reagent.core :as reagent]))
 
 ;; # JSXGraph.cljs
 ;;
@@ -17,8 +25,7 @@
 ;; [![cljdoc badge](https://cljdoc.org/badge/org.mentat/jsxgraph.cljs)](https://cljdoc.org/d/org.mentat/jsxgraph.cljs/CURRENT)
 ;; [![Clojars Project](https://img.shields.io/clojars/v/org.mentat/jsxgraph.cljs.svg)](https://clojars.org/org.mentat/jsxgraph.cljs)
 ;;
-;; > The interactive documentation on this page was generated from [this source
-;; > file](https://github.com/mentat-collective/jsxgraph.cljs/blob/$GIT_SHA/dev/jsxgraph/notebook.clj)
+;; > The interactive documentation on this page was generated
 ;; > using [Clerk](https://github.com/nextjournal/clerk). Follow
 ;; > the [instructions in the
 ;; > README](https://github.com/mentat-collective/jsxgraph.cljs/tree/main#interactive-documentation-via-clerk)
@@ -47,8 +54,8 @@
 ;; > checkmarks to toggle on and off the elements that contribute to each point
 ;; > on the Euler Line.
 
-^{:nextjournal.clerk/visibility {:code :fold}}
-(cljs
+^{::clerk/visibility {:code :fold}}
+(show-sci
  (let [!state (atom
                {:circumcenter true
                 :orthocenter true
@@ -197,12 +204,10 @@
 ;;    Project](https://img.shields.io/clojars/v/org.mentat/jsxgraph.cljs.svg)](https://clojars.org/org.mentat/jsxgraph.cljs)
 ;;
 ;; Or grab the most recent code using a Git dependency:
-;;
-;; ```clj
-;; ;; deps
-;; {io.github.mentat-collective/jsxgraph.cljs
-;;   {:git/sha "$GIT_SHA"}}
-;; ```
+
+^{::clerk/visibility {:code :hide}}
+(docs/git-dependency
+ "mentat-collective/jsxgraph.cljs")
 
 ;; Require `jsxgraph.core` in your namespace:
 
@@ -212,12 +217,24 @@
 ;;             [reagent.core :as reagent]))
 ;; ```
 ;;
+;; You'll also need to include the stylesheets that ship with `jsxgraph`. If
+;; you're using Clerk
+;; and [`clerk-utils`](https://github.com/mentat-collective/clerk-utils), add
+;; this form to `dev/user.clj`:
+
+;; ```clj
+;; (mentat.clerk-utils.css/set-css!
+;;  "https://cdn.jsdelivr.net/npm/jsxgraph@1.5.0/distrib/jsxgraph.css")
+;; ```
+;;
+;; Otherwise find some way to load this CSS file in your project's header.
+;;
 ;; The main entrypoint to the library is the `jsxgraph.core/JSXGraph` component.
 ;; Each class in the [JSXGraph API](https://jsxgraph.org/docs/index.html) has a
 ;; corresponding component bound as `jsx/ClassName`. Use these to build a simple
 ;; arrow and drag it around by its point:
 
-(cljs
+(show-sci
  [jsx/JSXGraph {:boundingbox [-2 2 2 -2] :axis true}
   [jsx/Arrow {:name "A" :size 4
               :parents [[0 0] [1 1]]}]])
@@ -249,7 +266,7 @@
 ;;
 ;; Declare a board with the `jsx/JSXGraph` component:
 
-(cljs
+(show-sci
  [jsx/JSXGraph {:axis true}])
 
 ;; The component takes
@@ -267,7 +284,7 @@
 ;; For example, here's a board with two `jsx/Point`s and a `jsx/Arrow` between
 ;; them:
 
-(cljs
+(show-sci
  [jsx/JSXGraph {:boundingbox [-3 3 3 -3] :axis true}
   [jsx/Point {:name "A" :size 1 :parents [-1 1]}]
   [jsx/Point {:id "B" :name "BEE!" :size 1 :parents [2 -1]}]
@@ -288,7 +305,7 @@
 ;;
 ;; You can also refer to elements by their classname, written as either a string or a keyword:
 
-(cljs
+(show-sci
  [jsx/JSXGraph {:boundingbox [-3 3 3 -3] :axis true}
   [:point {:name "A" :size 1 :parents [-1 1]}]
   ["point" {:id "B" :name "BEE!" :size 1 :parents [2 -1]}]
@@ -318,7 +335,7 @@
 ;;
 ;; Drag the point around and the watch the state update:
 
-(cljs
+(show-sci
  (reagent/with-let
    [!state  (reagent/atom {:x 0 :y 0})
     update! (fn [p]
@@ -344,7 +361,7 @@
 ;; This example adds a first free `Point` named `"A"`, and a second `Point` with
 ;; position constrained to always equal `[cos(A_x), sin(A_y)]`.
 
-(cljs
+(show-sci
  (reagent/with-let
    [!state  (reagent/atom {:x 0 :y 0})
     update! (fn [p]
@@ -385,7 +402,7 @@
 ;; its `Y` coordinate free and its `X` coordinate constrained to always equal
 ;; `A_x + A_y`:
 
-(cljs
+(show-sci
  [jsx/JSXGraph {:axis true}
   [jsx/Point {:name "A" :parents [0 0]}]
   [jsx/Point {:name "B" :parents ["X(A) + Y(A)" 2]}]])
@@ -401,7 +418,7 @@
 ;; instance of the element when it is mounted, and `nil` when the board is
 ;; destroyed or the element is remounted.
 
-(cljs
+(show-sci
  [jsx/JSXGraph {:axis true}
   [:point
    {:parents [1 1]
@@ -418,7 +435,7 @@
 ;; bottom left of the scene can query it inside its parent function. See the
 ;; inline comments for more detail.
 
-(cljs
+(show-sci
  (let [!state (atom {:slider 4 :riemann nil})
        f      (fn [x]
                 ;; 1/2 x^2 - 2x
@@ -461,7 +478,7 @@
 ;; and returns a vector of the form `[:<> <any-number-of-elements>]`. Here is a
 ;; component that accepts 3 vertex point definitions and creates a triangle:
 
-(cljs
+(show-sci
  (defn Triangle [a b c]
    [:<>
     [jsx/Point {:name "A" :size 4 :parents a}]
@@ -472,7 +489,7 @@
 ;; Use your component by including a vector of the form `[ComponentName
 ;; <arguments>]` as a child if your `JSXGraph` component;
 
-(cljs
+(show-sci
  [jsx/JSXGraph {:axis true}
   [Triangle
    [-1 -1] [1 1] [-1 1]]])
@@ -480,7 +497,7 @@
 ;; You can abstract this example further by writing your own version of a
 ;; `Polygon` element that takes a map of ID => a point's `:parents` entry:
 
-(cljs
+(show-sci
  (defn MyPolygon [id->parents]
    (let [ids (into [] (keys id->parents))
          points (for [[id parents] id->parents]
@@ -492,14 +509,14 @@
 
 ;; Re-define a version of `Triangle` that uses `MyPolygon`:
 
-(cljs
+(show-sci
  (defn Triangle* [a b c]
    [MyPolygon {:A a :B b :C c}]))
 
 ;; These elements should look exactly the same as the previous `Triangle`
 ;; definition:
 
-(cljs
+(show-sci
  [jsx/JSXGraph {:axis true}
   [Triangle*
    [-1 -1] [1 1] [-1 1]]])
@@ -519,7 +536,7 @@
 
 ;; First, our state:
 
-(cljs
+(show-sci
  (defonce !state
    (atom {:x 1 :y 1})))
 
@@ -527,7 +544,7 @@
 ;; function (see [Component Refs](#Component%20Refs)) to perform the [`addChild`
 ;; mutation](https://jsxgraph.org/docs/symbols/JXG.Board.html#addChild):
 
-(cljs
+(show-sci
  (let [update! (fn [p]
                  (swap! !state assoc
                         :x (.X p)
@@ -545,8 +562,8 @@
 ;; and `:y` coordinates stored in `!state`. (The next example is folded so you
 ;; can see both boards at once. Click "show code" to unfold.)
 
-^{:nextjournal.clerk/visibility {:code :fold}}
-(cljs
+^{::clerk/visibility {:code :fold}}
+(show-sci
  [jsx/JSXGraph
   {:axis true
    :style {:height "300px"}
@@ -555,6 +572,83 @@
             (.addChild (:board @!state) b)))}
   [jsx/Point {:parents
               [#(:x @!state) #(:y @!state)]}]])
+
+;; ## JSXGraph.cljs via SCI
+;;
+;; `JSXGraph.cljs` is compatible with [SCI, the Small Clojure
+;; Interpreter](https://github.com/babashka/sci).
+;;
+;; To install `JSXGraph.cljs` into your SCI context, require
+;; the [`jsxgraph.sci`](https://cljdoc.org/d/org.mentat/jsxgraph.cljs/CURRENT/api/jsxgraph.sci)
+;; namespace and call `jsxgraph.sci/install!`:
+
+;; ```clj
+;; (ns myproject.sci-extensions
+;;   (:require [jsxgraph.sci]))
+
+;; (jsxgraph.sci/install!)
+;; ```
+;;
+;; If you want more granular control, see the [cljdoc page for
+;; `jsxgraph.sci`](https://cljdoc.org/d/org.mentat/jsxgraph.cljs/CURRENT/api/jsxgraph.sci)
+;; for an SCI config and distinct SCI namespace objects that you can piece
+;; together.
+;;
+;; > Note that `JSXGraph.cljs` does not ship with a dependency on SCI, so you'll
+;; > need to install your own version.
+;;
+;; ## JSXGraph.cljs via Clerk
+;;
+;; Using `JSXGraph.cljs` with Nextjournal's [Clerk](https://clerk.vision/) gives
+;; you the ability to write notebooks like this one with embedded JSXGraph
+;; constructions.
+;;
+;; Doing this requires that you generate a custom ClojureScript build for your
+;; Clerk project. The easiest way to do this for an existing project is with
+;; the [`clerk-utils` project](https://clerk-utils.mentat.org/). Follow the
+;; instructions on the [`clerk-utils` guide for custom
+;; ClojureScript](https://clerk-utils.mentat.org/#custom-clojurescript-builds).
+;;
+;; If this is your first time using Clerk, use the [`jsxgraph/clerk` template
+;; described below](#project-template) to generate a new project with all steps
+;; described in ["JSXGraph.cljs via SCI"](#jsxgraph.cljs-via-sci) already
+;; completed.
+
+;; ## Project Template
+;;
+;; `JSXGraph.cljs` includes
+;; a [`deps-new`](https://github.com/seancorfield/deps-new) template called
+;; [`jsxgraph/clerk`](https://github.com/mentat-collective/jsxgraph.cljs/tree/main/resources/jsxgraph/clerk)
+;; that makes it easy to configure a new Clerk project with everything described
+;; in ["JSXGraph.cljs via SCI"](#jsxgraph.cljs-via-sci) already configured.
+
+;; First, install the [`deps-new`](https://github.com/seancorfield/deps-new) tool:
+
+;; ```sh
+;; clojure -Ttools install io.github.seancorfield/deps-new '{:git/tag "v0.5.0"}' :as new
+;; ```
+
+;; To create a new Clerk project based on
+;; [`jsxgraph/clerk`](https://github.com/mentat-collective/jsxgraph.cljs/tree/main/resources/jsxgraph/clerk)
+;; in a folder called `my-notebook-project`, run the following command:
+
+^{::clerk/visibility {:code :hide}}
+(clerk/md
+ (format "
+```sh
+clojure -Sdeps '{:deps {io.github.mentat-collective/jsxgraph.cljs {:git/sha \"%s\"}}}' \\
+-Tnew create \\
+:template jsxgraph/clerk \\
+:name myusername/my-notebook-project
+```" (docs/git-sha)))
+
+;; The `README.md` file in the generated project contains information on how to
+;; develop within the new project.
+
+;; If you have an existing Clerk notebook project and are considering adding
+;; `JSXGraph.cljs`, you might consider
+;; using [`jsxgraph/clerk`](https://github.com/mentat-collective/jsxgraph.cljs/tree/main/resources/jsxgraph/clerk)
+;; to get some ideas on how to structure your own project.
 
 ;; ## Advanced Examples
 ;;
@@ -578,7 +672,7 @@
 ;; > The original example lives at [this
 ;; > page](http://jsxgraph.org/wiki/index.php/Archimedean_spiral).
 
-(cljs
+(show-sci
  ;; The `!state` atom is populated with the initial slider positions. Note that
  ;; we are NOT using a `reagent/atom`, because we don't need Reagent to perform
  ;; any re-renders when the state changes. Instead, state changes are picked up
@@ -639,7 +733,7 @@
 ;; The original example lives at [this
 ;; page](http://jsxgraph.org/wiki/index.php/Lissajous_curves).
 
-(cljs
+(show-sci
  (let [!state (atom {:a 3 :b 2 :A 3 :B 3 :delta 0})]
    [jsx/JSXGraph
     {:boundingbox [-8 8 8 -8]
@@ -689,7 +783,7 @@
 ;; The component below also shows off a case where we _do_ need to use a
 ;; `reagent/atom`.
 
-(cljs
+(show-sci
  (defn UnitCircle [n]
    (let [ids (range n)
          i->pt (fn [i]
@@ -719,7 +813,7 @@
 ;;
 ;; Drag the slider around and note the slight flicker as the board redraws.
 
-(cljs
+(show-sci
  (reagent/with-let
    [!n    (reagent/atom 6)
     ->!n #(reset! !n (.Value %))]
@@ -755,7 +849,7 @@
 ;; First we'll create our `!state` outside of the `reagent/with-let` block. This
 ;; will let other components access the state.
 
-(cljs
+(show-sci
  (defonce !r-state
    (reagent/atom
     {:start -3 :end (* 2 Math/PI) :n 10})))
@@ -763,7 +857,7 @@
 ;; The board uses `reagent/with-let`; this will prevent the dereference calls
 ;; inside the bindings from triggering a component re-render.
 
-(cljs
+(show-sci
  (reagent/with-let
    [init         @!r-state
     start-update #(swap! !r-state assoc :start (.Value %))
@@ -820,7 +914,7 @@
 ;; other components, and they'll re-render on any update to `!r-state`. Change the
 ;; sliders above and watch these values change:
 
-(cljs
+(show-sci
  [:pre (str (dissoc @!r-state :riemann))])
 
 ;; ### Vector Field
@@ -843,7 +937,7 @@
 ;; `:opacity-fn` takes the coordinates of the base of the vector and returns its
 ;; opacity.
 
-(cljs
+(show-sci
  (defn VectorField
    [{:keys [dimensions coords-fn opacity-fn scale]
      :or {scale 1
@@ -876,7 +970,7 @@
 ;; customize the `VectorField`'s vector values based on the position of a
 ;; moveable `Point` in the scene. Drag the point around!
 
-(cljs
+(show-sci
  (let [!coords (atom {:x 0.6 :y 0.6})
        update! (fn [p]
                  (swap! !coords assoc
@@ -936,7 +1030,7 @@
 ;;
 ;; $$F(x, y) = \sin\left(\frac{xy}{4}\right).$$
 
-(cljs
+(show-sci
  (let [box [-5 5]
        F   (fn [x y]
              (Math/sin (* x (/ y 4))))]
@@ -986,7 +1080,7 @@
 
 ;; In `JSXGraph.cljs` we can write the example like this:
 
-(cljs
+(show-sci
  [jsx/JSXGraph {:boundingbox [-5 5 5 -2]
                 :keepAspectRatio true}
   [:point {:name "A" :size 4 :face "o" :parents [0 0]}]
@@ -1041,7 +1135,7 @@
 ;; You can use these components directly in place of the keyword in the example
 ;; above:
 
-(cljs
+(show-sci
  [jsx/JSXGraph {:boundingbox [-5 5 5 -2] :showCopyright false}
   [jsx/Point {:name "A" :size 4 :parents [-1 1]}]
   [jsx/Point {:name "B" :size 4 :parents [2 -1]}]
@@ -1058,7 +1152,7 @@
 ;; Use `jsxgraph.core/create` just like you'd use `board.create` in JavaScript
 ;; to add elements:
 
-(cljs
+(show-sci
  [jsx/JSXGraph
   {:boundingbox [-5 5 5 -2]
    :style {:height "200px" :width "100%"}
@@ -1105,7 +1199,7 @@
 
 ;; ## License
 
-;; Copyright © 2022 Sam Ritchie.
+;; Copyright © 2022-2023 Sam Ritchie.
 
 ;; Distributed under the [MIT
 ;; License](https://github.com/mentat-collective/jsxgraph.cljs/blob/main/LICENSE).

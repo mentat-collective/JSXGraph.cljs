@@ -1,24 +1,26 @@
 # JSXGraph.cljs
 
-[![Build Status](https://github.com/mentat-collective/jsxgraph.cljs/actions/workflows/kondo.yml/badge.svg?branch=main)](https://github.com/mentat-collective/jsxgraph.cljs/actions/workflows/kondo.yml)
-[![License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://github.com/mentat-collective/jsxgraph.cljs/blob/main/LICENSE)
-[![cljdoc badge](https://cljdoc.org/badge/org.mentat/jsxgraph.cljs)](https://cljdoc.org/d/org.mentat/jsxgraph.cljs/CURRENT)
-[![Clojars Project](https://img.shields.io/clojars/v/org.mentat/jsxgraph.cljs.svg)](https://clojars.org/org.mentat/jsxgraph.cljs)
+[![Build Status][build-status]][build-status-url]
+[![License][license]][license-url]
+[![cljdoc badge][cljdoc]][cljdoc-url]
+[![Clojars Project][clojars]][clojars-url]
+[![Discord Shield][discord]][discord-url]
 
-[JSXGraph][JSXGraph] is a JavaScript library that lets you build 2-dimensional
-scenes full of geometric objects, function curves and interactive UI elements,
-potentially with many complex constraints defined between these objects.
+[JSXGraph][jsxgraph-url] is a JavaScript library that lets you build
+2-dimensional scenes full of geometric objects, function curves and interactive
+UI elements, potentially with many complex constraints defined between these
+objects.
 
-[JSXGraph.cljs](https://github.com/mentat-collective/jsxgraph.cljs) extends
-JSXGraph with a [React][REACT] / [Reagent][REAGENT] component that makes it easy to define
-JSXGraph constructions inside of a user interface built with Clojurescript.
+[JSXGraph.cljs][github-url] extends JSXGraph with a [React][react-url] /
+[Reagent][reagent-url] component that makes it easy to define JSXGraph
+constructions inside of a user interface built with Clojurescript.
 
 ## Quickstart
 
-Install `jsxgraph.cljs` into your Clojurescript project using the instructions
+Install `JSXGraph.cljs` into your Clojurescript project using the instructions
 at its Clojars page:
 
-[![Clojars Project](https://img.shields.io/clojars/v/org.mentat/jsxgraph.cljs.svg)](https://clojars.org/org.mentat/jsxgraph.cljs)
+[![Clojars Project][clojars]][clojars-url](https://clojars.org/org.mentat/jsxgraph.cljs)
 
 Require `jsxgraph.core` in your namespace:
 
@@ -61,31 +63,32 @@ If you run into trouble, [see the `canvas` docs page on
 compilation](https://github.com/Automattic/node-canvas#compiling) for
 instructions on how to install the dependencies for this process.
 
+## Clerk Support
+
+If you want to use `JSXGraph.cljs` with [Clerk][clerk-url], check out the
+[`jsxgraph/clerk` template][jsxgraph-clerk-template-url]. This
+[`deps-new`][deps-new-url] template will generate a Clerk project for you, fully
+configured to use `JSXGraph.cljs` in your Clerk notebooks.
+
 ## Interactive Documentation via Clerk
 
 The project's [interactive documentation](https://jsxgraph.mentat.org) was
-generated using Nextjournal's [Clerk](https://github.com/nextjournal/clerk). If
+generated using Nextjournal's [Clerk][clerk-url]. If
 you'd like to edit or play with the documentation, you'll need to install
 
 - [node.js](https://nodejs.org/en/)
 - The [clojure command line tool](https://clojure.org/guides/install_clojure)
 - [Babashka](https://github.com/babashka/babashka#installation)
 
-Once this is done, run this command in one terminal window to build and serve the custom JS required by the notebook:
+Once this is done, run this command:
 
-```
-bb dev-notebook
-```
-
-In another terminal window, run
-
-```
-bb start-clerk
+```sh
+bb clerk-watch
 ```
 
-This should open a browser window to `http://localhost:7777` with the contents
-of the documentation notebook. Any edits you make to `dev/jsxgraph/notebook.clj`
-will be picked up and displayed in the browser on save.
+This will open a browser window to `http://localhost:7777` with the contents of
+the documentation notebook. Any edits you make to `dev/jsxgraph/notebook.clj` will
+be picked up and displayed in the browser on save.
 
 ## Thanks and Support
 
@@ -100,11 +103,24 @@ projects like it.
 
 ## License
 
-Copyright © 2022 Sam Ritchie.
+Copyright © 2022-2023 Sam Ritchie.
 
 Distributed under the [MIT License](LICENSE). See [LICENSE](LICENSE).
 
-[CLJS]: https://clojurescript.org/
-[JSXGRAPH]: https://jsxgraph.org/
-[REACT]: https://reactjs.org/
-[REAGENT]: https://reagent-project.github.io/
+[build-status-url]: https://github.com/mentat-collective/jsxgraph.cljs/actions/workflows/kondo.yml
+[build-status]: https://github.com/mentat-collective/jsxgraph.cljs/actions/workflows/kondo.yml/badge.svg?branch=main
+[cljdoc-url]: https://cljdoc.org/d/org.mentat/jsxgraph.cljs/CURRENT
+[cljdoc]: https://cljdoc.org/badge/org.mentat/jsxgraph.cljs
+[clojars-url]: https://clojars.org/org.mentat/jsxgraph.cljs
+[clojars]: https://img.shields.io/clojars/v/org.mentat/jsxgraph.cljs.svg
+[discord-url]: https://discord.gg/hsRBqGEeQ4
+[discord]: https://img.shields.io/discord/731131562002743336?style=flat&colorA=000000&colorB=000000&label=&logo=discord
+[license-url]: LICENSE
+[license]: https://img.shields.io/badge/license-MIT-brightgreen.svg
+[github-url]: https://github.com/mentat-collective/jsxgraph.cljs
+[jsxgraph-url]: https://jsxgraph.org/
+[react-url]: https://reactjs.org/
+[reagent-url]: https://reagent-project.github.io
+[deps-new-url]: https://github.com/seancorfield/deps-new
+[jsxgraph-clerk-template-url]: https://github.com/mentat-collective/jsxgraph.cljs/tree/main/resources/jsxgraph/clerk
+[clerk-url]: https://clerk.vision
