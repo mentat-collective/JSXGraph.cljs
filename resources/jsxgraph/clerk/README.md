@@ -14,7 +14,7 @@ clojure -Ttools install io.github.seancorfield/deps-new '{:git/tag "v0.5.0"}' :a
 Then create a project using the `jsxgraph/clerk` template:
 
 ```
-clojure -Sdeps '{:deps {io.github.mentat-collective/jsxgraph.cljs {:git/sha "5b613fe5b2d4a9ad3294de51543d146a43a19ebc"}}}' \
+clojure -Sdeps '{:deps {io.github.mentat-collective/jsxgraph.cljs {:git/tag "v0.2.0" :git/sha "d749a5f"}}}' \
 -Tnew create \
 :template jsxgraph/clerk \
 :name myusername/my-jsxgraph-project
