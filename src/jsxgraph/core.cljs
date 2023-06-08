@@ -2,8 +2,8 @@
   "React/Reagent implementation of a component that exposes the API from
   http://jsxgraph.org/ in a more declarative way."
   (:require ["jsxgraph" :as jsx]
-            [reagent.core :as re]
-            ["react" :as react]))
+            ["react" :as react]
+            [reagent.core :as re]))
 
 ;; ## Utilities
 
@@ -14,16 +14,15 @@
   board-context
   (react/createContext nil))
 
-(def ^{:no-doc true
-       :doc "Use like
+(def ^:no-doc Provider
+  "Use like
 
-```clj
-[:> Provider {:value <board>} <children>]
-```
+  ```clj
+  [:> Provider {:value <board>} <children>]
+  ```
 
-to provide any element in `<children>` with access to the bound `board` instance
-  via `(react/useContext board-context)`."}
-  Provider
+  to provide any element in `<children>` with access to the bound `board` instance
+  via `(react/useContext board-context)`."
   (.-Provider board-context))
 
 (defn create
@@ -47,9 +46,7 @@ to provide any element in `<children>` with access to the bound `board` instance
                     (dissoc attributes "on")))]
     (when-let [m (attributes "on")]
       (doseq [[k f] m]
-        (let [callback (fn [_]
-                         (this-as elem
-                           (f elem)))]
+        (let [callback (fn [_] (f p))]
           (if (= k "update")
             (if-let [coords (.-coords p)]
               (.on coords "update" callback)
@@ -98,10 +95,8 @@ to provide any element in `<children>` with access to the bound `board` instance
 
 ;; ## Elements
 
-(def ^{:no-doc true
-       :doc "Map of element type to the actual Reagent component representing
-       that type."}
-  k->elem
+(def ^:no-doc k->elem
+  "Map of element type to the actual Reagent component representing that type."
   {"angle"                (element "angle")
    "arc"                  (element "arc")
    "arrow"                (element "arrow")
@@ -196,40 +191,41 @@ to provide any element in `<children>` with access to the bound `board` instance
 ;;
 ;; see `ElementType` in index.d.ts for the full list of valid elements.
 
-(def ^{:doc "Reagent component representing
+(def Angle
+  "Reagent component representing
   the [Angle](https://jsxgraph.org/docs/symbols/Angle.html) JSXGraph element.
   This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Angle.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  Angle
+  entry `:parents` with value containing the element's required parents."
   (k->elem "angle"))
 
-(def ^{:doc "Reagent component representing
-  the [Arc](https://jsxgraph.org/docs/symbols/Arc.html) JSXGraph element.
-  This component must appear as a child of a [[JSXGraph]] component.
+(def Arc
+  "Reagent component representing
+  the [Arc](https://jsxgraph.org/docs/symbols/Arc.html) JSXGraph element. This
+  component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Arc.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  Arc
+  entry `:parents` with value containing the element's required parents."
   (k->elem "arc"))
 
-(def ^{:doc "Reagent component representing
+(def Arrow
+  "Reagent component representing
   the [Arrow](https://jsxgraph.org/docs/symbols/Arrow.html) JSXGraph element.
   This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Arrow.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  Arrow
+  entry `:parents` with value containing the element's required parents."
   (k->elem "arrow"))
 
-(def ^{:doc "Reagent component representing
+(def ArrowParallel
+  "Reagent component representing
   the [ArrowParallel](https://jsxgraph.org/docs/symbols/ArrowParallel.html)
   JSXGraph element. This component must appear as a child of a [[JSXGraph]]
   component.
@@ -238,68 +234,68 @@ to provide any element in `<children>` with access to the bound `board` instance
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/ArrowParallel.html), the map must
   contain an entry `:parents` with value containing the element's required
-  parents."}
-  ArrowParallel
+  parents."
   (k->elem "arrowparallel"))
 
-(def ^{:doc "Reagent component representing
+(def Axis
+  "Reagent component representing
   the [Axis](https://jsxgraph.org/docs/symbols/Axis.html) JSXGraph element. This
   component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Axis.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  Axis
+  entry `:parents` with value containing the element's required parents."
   (k->elem "axis"))
 
-(def ^{:doc "Reagent component representing
+(def Bisector
+  "Reagent component representing
   the [Bisector](https://jsxgraph.org/docs/symbols/Bisector.html) JSXGraph
   element. This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Bisector.html), the map must contain
-  an entry `:parents` with value containing the element's required parents."}
-
-  Bisector
+  an entry `:parents` with value containing the element's required parents."
   (k->elem "bisector"))
 
-(def ^{:doc "Reagent component representing
-  the [Bisectorlines](https://jsxgraph.org/docs/symbols/Bisectorlines.html) JSXGraph element.
-  This component must appear as a child of a [[JSXGraph]] component.
+(def Bisectorlines
+  "Reagent component representing
+  the [Bisectorlines](https://jsxgraph.org/docs/symbols/Bisectorlines.html)
+  JSXGraph element. This component must appear as a child of a [[JSXGraph]]
+  component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
-  docs](https://jsxgraph.org/docs/symbols/Bisectorlines.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  Bisectorlines
+  docs](https://jsxgraph.org/docs/symbols/Bisectorlines.html), the map must
+  contain an entry `:parents` with value containing the element's required
+  parents."
   (k->elem "bisectorlines"))
 
-(def ^{:doc "Reagent component representing
+(def Boxplot
+  "Reagent component representing
   the [Boxplot](https://jsxgraph.org/docs/symbols/Boxplot.html) JSXGraph
   element. This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Boxplot.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-
-  Boxplot
+  entry `:parents` with value containing the element's required parents."
   (k->elem "boxplot"))
 
-(def ^{:doc "Reagent component representing
+(def Button
+  "Reagent component representing
   the [Button](https://jsxgraph.org/docs/symbols/Button.html) JSXGraph element.
   This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Button.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  Button
+  entry `:parents` with value containing the element's required parents."
   (k->elem "button"))
 
-(def ^{:doc "Reagent component representing
+(def CardinalSpline
+  "Reagent component representing
   the [CardinalSpline](https://jsxgraph.org/docs/symbols/CardinalSpline.html)
   JSXGraph element. This component must appear as a child of a [[JSXGraph]]
   component.
@@ -308,45 +304,44 @@ to provide any element in `<children>` with access to the bound `board` instance
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/CardinalSpline.html), the map must
   contain an entry `:parents` with value containing the element's required
-  parents."}
-  CardinalSpline
+  parents."
   (k->elem "cardinalspline"))
 
-(def ^{:doc "Reagent component representing
+(def Chart
+  "Reagent component representing
   the [Chart](https://jsxgraph.org/docs/symbols/Chart.html) JSXGraph element.
   This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Chart.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  Chart
+  entry `:parents` with value containing the element's required parents."
   (k->elem "chart"))
 
-(def ^{:doc "Reagent component representing
+(def Checkbox
+  "Reagent component representing
   the [Checkbox](https://jsxgraph.org/docs/symbols/Checkbox.html) JSXGraph
   element. This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Checkbox.html), the map must contain
-  an entry `:parents` with value containing the element's required parents."}
-
-  Checkbox
+  an entry `:parents` with value containing the element's required parents."
   (k->elem "checkbox"))
 
-(def ^{:doc "Reagent component representing
+(def Circle
+  "Reagent component representing
   the [Circle](https://jsxgraph.org/docs/symbols/Circle.html) JSXGraph element.
   This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Circle.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  Circle
+  "
   (k->elem "circle"))
 
-(def ^{:doc "Reagent component representing
+(def Circumcenter
+  "Reagent component representing
   the [Circumcenter](https://jsxgraph.org/docs/symbols/Circumcenter.html)
   JSXGraph element. This component must appear as a child of a [[JSXGraph]]
   component.
@@ -355,11 +350,11 @@ to provide any element in `<children>` with access to the bound `board` instance
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Circumcenter.html), the map must
   contain an entry `:parents` with value containing the element's required
-  parents."}
-  Circumcenter
+  parents."
   (k->elem "circumcenter"))
 
-(def ^{:doc "Reagent component representing
+(def Circumcircle
+  "Reagent component representing
   the [Circumcircle](https://jsxgraph.org/docs/symbols/Circumcircle.html)
   JSXGraph element. This component must appear as a child of a [[JSXGraph]]
   component.
@@ -368,11 +363,11 @@ to provide any element in `<children>` with access to the bound `board` instance
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Circumcircle.html), the map must
   contain an entry `:parents` with value containing the element's required
-  parents."}
-  Circumcircle
+  parents."
   (k->elem "circumcircle"))
 
-(def ^{:doc "Reagent component representing
+(def CircumcircleArc
+  "Reagent component representing
   the [CircumcircleArc](https://jsxgraph.org/docs/symbols/CircumcircleArc.html)
   JSXGraph element. This component must appear as a child of a [[JSXGraph]]
   component.
@@ -381,11 +376,11 @@ to provide any element in `<children>` with access to the bound `board` instance
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/CircumcircleArc.html), the map must
   contain an entry `:parents` with value containing the element's required
-  parents."}
-  CircumcircleArc
+  parents."
   (k->elem "circumcirclearc"))
 
-(def ^{:doc "Reagent component representing
+(def CircumcircleSector
+  "Reagent component representing
   the [CircumcircleSector](https://jsxgraph.org/docs/symbols/CircumcircleSector.html)
   JSXGraph element. This component must appear as a child of a [[JSXGraph]]
   component.
@@ -394,44 +389,44 @@ to provide any element in `<children>` with access to the bound `board` instance
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/CircumcircleSector.html), the map must
   contain an entry `:parents` with value containing the element's required
-  parents."}
-  CircumcircleSector
+  parents."
   (k->elem "circumcirclesector"))
 
-(def ^{:doc "Reagent component representing
+(def Comb
+  "Reagent component representing
   the [Comb](https://jsxgraph.org/docs/symbols/Comb.html) JSXGraph element. This
   component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Comb.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  Comb
+  entry `:parents` with value containing the element's required parents."
   (k->elem "comb"))
 
-(def ^{:doc "Reagent component representing
+(def Conic
+  "Reagent component representing
   the [Conic](https://jsxgraph.org/docs/symbols/Conic.html) JSXGraph element.
   This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Conic.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  Conic
+  entry `:parents` with value containing the element's required parents."
   (k->elem "conic"))
 
-(def ^{:doc "Reagent component representing
+(def Curve
+  "Reagent component representing
   the [Curve](https://jsxgraph.org/docs/symbols/Curve.html) JSXGraph element.
   This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Curve.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  Curve
+  entry `:parents` with value containing the element's required parents."
   (k->elem "curve"))
 
-(def ^{:doc "Reagent component representing
+(def CurveDifference
+  "Reagent component representing
   the [CurveDifference](https://jsxgraph.org/docs/symbols/CurveDifference.html)
   JSXGraph element. This component must appear as a child of a [[JSXGraph]]
   component.
@@ -440,11 +435,11 @@ to provide any element in `<children>` with access to the bound `board` instance
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/CurveDifference.html), the map must
   contain an entry `:parents` with value containing the element's required
-  parents."}
-  CurveDifference
+  parents."
   (k->elem "curvedifference"))
 
-(def ^{:doc "Reagent component representing
+(def CurveIntersection
+  "Reagent component representing
   the [CurveIntersection](https://jsxgraph.org/docs/symbols/CurveIntersection.html)
   JSXGraph element. This component must appear as a child of a [[JSXGraph]]
   component.
@@ -453,57 +448,58 @@ to provide any element in `<children>` with access to the bound `board` instance
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/CurveIntersection.html), the map must
   contain an entry `:parents` with value containing the element's required
-  parents."}
-  CurveIntersection
+  parents."
   (k->elem "curveintersection"))
 
-(def ^{:doc "Reagent component representing
+(def CurveUnion
+  "Reagent component representing
   the [CurveUnion](https://jsxgraph.org/docs/symbols/CurveUnion.html) JSXGraph
   element. This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/CurveUnion.html), the map must contain
-  an entry `:parents` with value containing the element's required parents."}
+  an entry `:parents` with value containing the element's required parents."
 
-  CurveUnion
   (k->elem "curveunion"))
 
-(def ^{:doc "Reagent component representing
-  the [Derivative](https://jsxgraph.org/docs/symbols/Derivative.html) JSXGraph element.
-  This component must appear as a child of a [[JSXGraph]] component.
+(def Derivative
+  "Reagent component representing
+  the [Derivative](https://jsxgraph.org/docs/symbols/Derivative.html) JSXGraph
+  element. This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
-  docs](https://jsxgraph.org/docs/symbols/Derivative.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  Derivative
+  docs](https://jsxgraph.org/docs/symbols/Derivative.html), the map must contain
+  an entry `:parents` with value containing the element's required parents."
   (k->elem "derivative"))
 
-(def ^{:doc "Reagent component representing
+(def Ellipse
+  "Reagent component representing
   the [Ellipse](https://jsxgraph.org/docs/symbols/Ellipse.html) JSXGraph
   element. This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Ellipse.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-
-  Ellipse
+  entry `:parents` with value containing the element's required parents."
   (k->elem "ellipse"))
 
-(def ^{:doc "Reagent component representing
-  the [ForeignObject](https://jsxgraph.org/docs/symbols/ForeignObject.html) JSXGraph element.
-  This component must appear as a child of a [[JSXGraph]] component.
+(def ForeignObject
+  "Reagent component representing
+  the [ForeignObject](https://jsxgraph.org/docs/symbols/ForeignObject.html)
+  JSXGraph element. This component must appear as a child of a [[JSXGraph]]
+  component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
-  docs](https://jsxgraph.org/docs/symbols/ForeignObject.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  ForeignObject
+  docs](https://jsxgraph.org/docs/symbols/ForeignObject.html), the map must
+  contain an entry `:parents` with value containing the element's required
+  parents."
   (k->elem "foreignobject"))
 
-(def ^{:doc "Reagent component representing
+(def FunctionGraph
+  "Reagent component representing
   the [FunctionGraph](https://jsxgraph.org/docs/symbols/FunctionGraph.html)
   JSXGraph element. This component must appear as a child of a [[JSXGraph]]
   component.
@@ -512,216 +508,213 @@ to provide any element in `<children>` with access to the bound `board` instance
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/FunctionGraph.html), the map must
   contain an entry `:parents` with value containing the element's required
-  parents."}
-  FunctionGraph
+  parents."
   (k->elem "functiongraph"))
 
-(def ^{:doc "Reagent component representing
+(def Glider
+  "Reagent component representing
   the [Glider](https://jsxgraph.org/docs/symbols/Glider.html) JSXGraph element.
   This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Glider.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-
-  Glider
+  entry `:parents` with value containing the element's required parents."
   (k->elem "glider"))
 
-(def ^{:doc "Reagent component representing
-  the [Grid](https://jsxgraph.org/docs/symbols/Grid.html) JSXGraph element.
-  This component must appear as a child of a [[JSXGraph]] component.
+(def Grid
+  "Reagent component representing
+  the [Grid](https://jsxgraph.org/docs/symbols/Grid.html) JSXGraph element. This
+  component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Grid.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  Grid
+  entry `:parents` with value containing the element's required parents."
   (k->elem "grid"))
 
-(def ^{:doc "Reagent component representing
+(def Group
+  "Reagent component representing
   the [Group](https://jsxgraph.org/docs/symbols/Group.html) JSXGraph element.
   This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Group.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  Group
+  entry `:parents` with value containing the element's required parents."
   (k->elem "group"))
 
-(def ^{:doc "Reagent component representing
+(def Hatch
+  "Reagent component representing
   the [Hatch](https://jsxgraph.org/docs/symbols/Hatch.html) JSXGraph element.
   This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Hatch.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  Hatch
+  entry `:parents` with value containing the element's required parents."
   (k->elem "hatch"))
 
-(def ^{:doc "Reagent component representing
+(def Hyperbola
+  "Reagent component representing
   the [Hyperbola](https://jsxgraph.org/docs/symbols/Hyperbola.html) JSXGraph
   element. This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Hyperbola.html), the map must contain
-  an entry `:parents` with value containing the element's required parents."}
-
-  Hyperbola
+  an entry `:parents` with value containing the element's required parents."
   (k->elem "hyperbola"))
 
-(def ^{:doc "Reagent component representing
+(def Image
+  "Reagent component representing
   the [Image](https://jsxgraph.org/docs/symbols/Image.html) JSXGraph element.
   This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Image.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  Image
+  entry `:parents` with value containing the element's required parents."
   (k->elem "image"))
 
-(def ^{:doc "Reagent component representing
+(def Incenter
+  "Reagent component representing
   the [Incenter](https://jsxgraph.org/docs/symbols/Incenter.html) JSXGraph
   element. This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Incenter.html), the map must contain
-  an entry `:parents` with value containing the element's required parents."}
+  an entry `:parents` with value containing the element's required parents."
 
-  Incenter
   (k->elem "incenter"))
 
-(def ^{:doc "Reagent component representing
-  the [Incircle](https://jsxgraph.org/docs/symbols/Incircle.html) JSXGraph element.
-  This component must appear as a child of a [[JSXGraph]] component.
+(def Incircle
+  "Reagent component representing
+  the [Incircle](https://jsxgraph.org/docs/symbols/Incircle.html) JSXGraph
+  element. This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
-  docs](https://jsxgraph.org/docs/symbols/Incircle.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  Incircle
+  docs](https://jsxgraph.org/docs/symbols/Incircle.html), the map must contain
+  an entry `:parents` with value containing the element's required parents."
   (k->elem "incircle"))
 
-(def ^{:doc "Reagent component representing
+(def Inequality
+  "Reagent component representing
   the [Inequality](https://jsxgraph.org/docs/symbols/Inequality.html) JSXGraph
   element. This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Inequality.html), the map must contain
-  an entry `:parents` with value containing the element's required parents."}
-
-  Inequality
+  an entry `:parents` with value containing the element's required parents."
   (k->elem "inequality"))
 
-(def ^{:doc "Reagent component representing
+(def Input
+  "Reagent component representing
   the [Input](https://jsxgraph.org/docs/symbols/Input.html) JSXGraph element.
   This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Input.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  Input
+  entry `:parents` with value containing the element's required parents."
   (k->elem "input"))
 
-(def ^{:doc "Reagent component representing
+(def Integral
+  "Reagent component representing
   the [Integral](https://jsxgraph.org/docs/symbols/Integral.html) JSXGraph
   element. This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Integral.html), the map must contain
-  an entry `:parents` with value containing the element's required parents."}
-
-  Integral
+  an entry `:parents` with value containing the element's required parents."
   (k->elem "integral"))
 
-(def ^{:doc "Reagent component representing
-  the [Intersection](https://jsxgraph.org/docs/symbols/Intersection.html) JSXGraph element.
-  This component must appear as a child of a [[JSXGraph]] component.
+(def Intersection
+  "Reagent component representing
+  the [Intersection](https://jsxgraph.org/docs/symbols/Intersection.html)
+  JSXGraph element. This component must appear as a child of a [[JSXGraph]]
+  component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
-  docs](https://jsxgraph.org/docs/symbols/Intersection.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  Intersection
+  docs](https://jsxgraph.org/docs/symbols/Intersection.html), the map must
+  contain an entry `:parents` with value containing the element's required
+  parents."
   (k->elem "intersection"))
 
-(def ^{:doc "Reagent component representing
+(def Label
+  "Reagent component representing
   the [Label](https://jsxgraph.org/docs/symbols/Label.html) JSXGraph element.
   This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Label.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  Label
+  entry `:parents` with value containing the element's required parents."
   (k->elem "label"))
 
-(def ^{:doc "Reagent component representing
+(def Legend
+  "Reagent component representing
   the [Legend](https://jsxgraph.org/docs/symbols/Legend.html) JSXGraph element.
   This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Legend.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-
-  Legend
+  entry `:parents` with value containing the element's required parents."
   (k->elem "legend"))
 
-(def ^{:doc "Reagent component representing
-  the [Line](https://jsxgraph.org/docs/symbols/Line.html) JSXGraph element.
-  This component must appear as a child of a [[JSXGraph]] component.
+(def Line
+  "Reagent component representing
+  the [Line](https://jsxgraph.org/docs/symbols/Line.html) JSXGraph element. This
+  component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Line.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  Line
+  entry `:parents` with value containing the element's required parents."
   (k->elem "line"))
 
-(def ^{:doc "Reagent component representing
+(def Locus
+  "Reagent component representing
   the [Locus](https://jsxgraph.org/docs/symbols/Locus.html) JSXGraph element.
   This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Locus.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  Locus
+  entry `:parents` with value containing the element's required parents."
   (k->elem "locus"))
 
-(def ^{:doc "Reagent component representing
+(def MajorArc
+  "Reagent component representing
   the [MajorArc](https://jsxgraph.org/docs/symbols/MajorArc.html) JSXGraph
   element. This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/MajorArc.html), the map must contain
-  an entry `:parents` with value containing the element's required parents."}
-
-  MajorArc
+  an entry `:parents` with value containing the element's required parents."
   (k->elem "majorarc"))
 
-(def ^{:doc "Reagent component representing
-  the [MajorSector](https://jsxgraph.org/docs/symbols/MajorSector.html) JSXGraph element.
-  This component must appear as a child of a [[JSXGraph]] component.
+(def MajorSector
+  "Reagent component representing
+  the [MajorSector](https://jsxgraph.org/docs/symbols/MajorSector.html) JSXGraph
+  element. This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
-  docs](https://jsxgraph.org/docs/symbols/MajorSector.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  MajorSector
+  docs](https://jsxgraph.org/docs/symbols/MajorSector.html), the map must
+  contain an entry `:parents` with value containing the element's required
+  parents."
   (k->elem "majorsector"))
 
-(def ^{:doc "Reagent component representing
+(def MetapostSpline
+  "Reagent component representing
   the [MetapostSpline](https://jsxgraph.org/docs/symbols/MetapostSpline.html)
   JSXGraph element. This component must appear as a child of a [[JSXGraph]]
   component.
@@ -730,34 +723,34 @@ to provide any element in `<children>` with access to the bound `board` instance
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/MetapostSpline.html), the map must
   contain an entry `:parents` with value containing the element's required
-  parents."}
-  MetapostSpline
+  parents."
   (k->elem "metapostspline"))
 
-(def ^{:doc "Reagent component representing
+(def Midpoint
+  "Reagent component representing
   the [Midpoint](https://jsxgraph.org/docs/symbols/Midpoint.html) JSXGraph
   element. This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Midpoint.html), the map must contain
-  an entry `:parents` with value containing the element's required parents."}
+  an entry `:parents` with value containing the element's required parents."
 
-  Midpoint
   (k->elem "midpoint"))
 
-(def ^{:doc "Reagent component representing
-  the [MinorArc](https://jsxgraph.org/docs/symbols/MinorArc.html) JSXGraph element.
-  This component must appear as a child of a [[JSXGraph]] component.
+(def MinorArc
+  "Reagent component representing
+  the [MinorArc](https://jsxgraph.org/docs/symbols/MinorArc.html) JSXGraph
+  element. This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
-  docs](https://jsxgraph.org/docs/symbols/MinorArc.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  MinorArc
+  docs](https://jsxgraph.org/docs/symbols/MinorArc.html), the map must contain
+  an entry `:parents` with value containing the element's required parents."
   (k->elem "minorarc"))
 
-(def ^{:doc "Reagent component representing
+(def MinorSector
+  "Reagent component representing
   the [MinorSector](https://jsxgraph.org/docs/symbols/MinorSector.html) JSXGraph
   element. This component must appear as a child of a [[JSXGraph]] component.
 
@@ -765,11 +758,11 @@ to provide any element in `<children>` with access to the bound `board` instance
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/MinorSector.html), the map must
   contain an entry `:parents` with value containing the element's required
-  parents."}
-  MinorSector
+  parents."
   (k->elem "minorsector"))
 
-(def ^{:doc "Reagent component representing
+(def MirrorElement
+  "Reagent component representing
   the [MirrorElement](https://jsxgraph.org/docs/symbols/MirrorElement.html)
   JSXGraph element. This component must appear as a child of a [[JSXGraph]]
   component.
@@ -778,11 +771,11 @@ to provide any element in `<children>` with access to the bound `board` instance
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/MirrorElement.html), the map must
   contain an entry `:parents` with value containing the element's required
-  parents."}
-  MirrorElement
+  parents."
   (k->elem "mirrorelement"))
 
-(def ^{:doc "Reagent component representing
+(def MirrorPoint
+  "Reagent component representing
   the [MirrorPoint](https://jsxgraph.org/docs/symbols/MirrorPoint.html) JSXGraph
   element. This component must appear as a child of a [[JSXGraph]] component.
 
@@ -790,11 +783,11 @@ to provide any element in `<children>` with access to the bound `board` instance
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/MirrorPoint.html), the map must
   contain an entry `:parents` with value containing the element's required
-  parents."}
-  MirrorPoint
+  parents."
   (k->elem "mirrorpoint"))
 
-(def ^{:doc "Reagent component representing
+(def NonReflexAngle
+  "Reagent component representing
   the [NonReflexAngle](https://jsxgraph.org/docs/symbols/NonReflexAngle.html)
   JSXGraph element. This component must appear as a child of a [[JSXGraph]]
   component.
@@ -803,34 +796,35 @@ to provide any element in `<children>` with access to the bound `board` instance
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/NonReflexAngle.html), the map must
   contain an entry `:parents` with value containing the element's required
-  parents."}
-  NonReflexAngle
+  parents."
   (k->elem "nonreflexangle"))
 
-(def ^{:doc "Reagent component representing
+(def Normal
+  "Reagent component representing
   the [Normal](https://jsxgraph.org/docs/symbols/Normal.html) JSXGraph element.
   This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Normal.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-
-  Normal
+  entry `:parents` with value containing the element's required parents."
   (k->elem "normal"))
 
-(def ^{:doc "Reagent component representing
-  the [OrthogonalProjection](https://jsxgraph.org/docs/symbols/OrthogonalProjection.html) JSXGraph element.
-  This component must appear as a child of a [[JSXGraph]] component.
+(def OrthogonalProjection
+  "Reagent component representing
+  the [OrthogonalProjection](https://jsxgraph.org/docs/symbols/OrthogonalProjection.html)
+  JSXGraph element. This component must appear as a child of a [[JSXGraph]]
+  component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
-  docs](https://jsxgraph.org/docs/symbols/OrthogonalProjection.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  OrthogonalProjection
+  docs](https://jsxgraph.org/docs/symbols/OrthogonalProjection.html), the map
+  must contain an entry `:parents` with value containing the element's required
+  parents."
   (k->elem "orthogonalprojection"))
 
-(def ^{:doc "Reagent component representing
+(def OtherIntersection
+  "Reagent component representing
   the [OtherIntersection](https://jsxgraph.org/docs/symbols/OtherIntersection.html)
   JSXGraph element. This component must appear as a child of a [[JSXGraph]]
   component.
@@ -839,34 +833,34 @@ to provide any element in `<children>` with access to the bound `board` instance
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/OtherIntersection.html), the map must
   contain an entry `:parents` with value containing the element's required
-  parents."}
-  OtherIntersection
+  parents."
   (k->elem "otherintersection"))
 
-(def ^{:doc "Reagent component representing
+(def Parabola
+  "Reagent component representing
   the [Parabola](https://jsxgraph.org/docs/symbols/Parabola.html) JSXGraph
   element. This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Parabola.html), the map must contain
-  an entry `:parents` with value containing the element's required parents."}
+  an entry `:parents` with value containing the element's required parents."
 
-  Parabola
   (k->elem "parabola"))
 
-(def ^{:doc "Reagent component representing
-  the [Parallel](https://jsxgraph.org/docs/symbols/Parallel.html) JSXGraph element.
-  This component must appear as a child of a [[JSXGraph]] component.
+(def Parallel
+  "Reagent component representing
+  the [Parallel](https://jsxgraph.org/docs/symbols/Parallel.html) JSXGraph
+  element. This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
-  docs](https://jsxgraph.org/docs/symbols/Parallel.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  Parallel
+  docs](https://jsxgraph.org/docs/symbols/Parallel.html), the map must contain
+  an entry `:parents` with value containing the element's required parents."
   (k->elem "parallel"))
 
-(def ^{:doc "Reagent component representing
+(def ParallelPoint
+  "Reagent component representing
   the [ParallelPoint](https://jsxgraph.org/docs/symbols/ParallelPoint.html)
   JSXGraph element. This component must appear as a child of a [[JSXGraph]]
   component.
@@ -875,11 +869,11 @@ to provide any element in `<children>` with access to the bound `board` instance
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/ParallelPoint.html), the map must
   contain an entry `:parents` with value containing the element's required
-  parents."}
-  ParallelPoint
+  parents."
   (k->elem "parallelpoint"))
 
-(def ^{:doc "Reagent component representing
+(def Perpendicular
+  "Reagent component representing
   the [Perpendicular](https://jsxgraph.org/docs/symbols/Perpendicular.html)
   JSXGraph element. This component must appear as a child of a [[JSXGraph]]
   component.
@@ -888,11 +882,11 @@ to provide any element in `<children>` with access to the bound `board` instance
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Perpendicular.html), the map must
   contain an entry `:parents` with value containing the element's required
-  parents."}
-  Perpendicular
+  parents."
   (k->elem "perpendicular"))
 
-(def ^{:doc "Reagent component representing
+(def PerpendicularPoint
+  "Reagent component representing
   the [PerpendicularPoint](https://jsxgraph.org/docs/symbols/PerpendicularPoint.html)
   JSXGraph element. This component must appear as a child of a [[JSXGraph]]
   component.
@@ -901,11 +895,11 @@ to provide any element in `<children>` with access to the bound `board` instance
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/PerpendicularPoint.html), the map must
   contain an entry `:parents` with value containing the element's required
-  parents."}
-  PerpendicularPoint
+  parents."
   (k->elem "perpendicularpoint"))
 
-(def ^{:doc "Reagent component representing
+(def PerpendicularSegment
+  "Reagent component representing
   the [PerpendicularSegment](https://jsxgraph.org/docs/symbols/PerpendicularSegment.html)
   JSXGraph element. This component must appear as a child of a [[JSXGraph]]
   component.
@@ -914,68 +908,69 @@ to provide any element in `<children>` with access to the bound `board` instance
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/PerpendicularSegment.html), the map
   must contain an entry `:parents` with value containing the element's required
-  parents."}
-  PerpendicularSegment
+  parents."
   (k->elem "perpendicularsegment"))
 
-(def ^{:doc "Reagent component representing
+(def Point
+  "Reagent component representing
   the [Point](https://jsxgraph.org/docs/symbols/Point.html) JSXGraph element.
   This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Point.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  Point
+  entry `:parents` with value containing the element's required parents."
   (k->elem "point"))
 
-(def ^{:doc "Reagent component representing
+(def PolarLine
+  "Reagent component representing
   the [PolarLine](https://jsxgraph.org/docs/symbols/PolarLine.html) JSXGraph
   element. This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/PolarLine.html), the map must contain
-  an entry `:parents` with value containing the element's required parents."}
-
-  PolarLine
+  an entry `:parents` with value containing the element's required parents."
   (k->elem "polarline"))
 
-(def ^{:doc "Reagent component representing
-  the [PolePoint](https://jsxgraph.org/docs/symbols/PolePoint.html) JSXGraph element.
-  This component must appear as a child of a [[JSXGraph]] component.
+(def PolePoint
+  "Reagent component representing
+  the [PolePoint](https://jsxgraph.org/docs/symbols/PolePoint.html) JSXGraph
+  element. This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
-  docs](https://jsxgraph.org/docs/symbols/PolePoint.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  PolePoint
+  docs](https://jsxgraph.org/docs/symbols/PolePoint.html), the map must contain
+  an entry `:parents` with value containing the element's required parents."
   (k->elem "polepoint"))
 
-(def ^{:doc "Reagent component representing
+(def Polygon
+  "Reagent component representing
   the [Polygon](https://jsxgraph.org/docs/symbols/Polygon.html) JSXGraph
   element. This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Polygon.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
+  entry `:parents` with value containing the element's required parents."
 
-  Polygon
   (k->elem "polygon"))
 
-(def ^{:doc "Reagent component representing
-  the [PolygonalChain](https://jsxgraph.org/docs/symbols/PolygonalChain.html) JSXGraph element.
-  This component must appear as a child of a [[JSXGraph]] component.
+(def PolygonalChain
+  "Reagent component representing
+  the [PolygonalChain](https://jsxgraph.org/docs/symbols/PolygonalChain.html)
+  JSXGraph element. This component must appear as a child of a [[JSXGraph]]
+  component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
-  docs](https://jsxgraph.org/docs/symbols/PolygonalChain.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  PolygonalChain
+  docs](https://jsxgraph.org/docs/symbols/PolygonalChain.html), the map must
+  contain an entry `:parents` with value containing the element's required
+  parents."
   (k->elem "polygonalchain"))
 
-(def ^{:doc "Reagent component representing
+(def RadicalAxis
+  "Reagent component representing
   the [RadicalAxis](https://jsxgraph.org/docs/symbols/RadicalAxis.html) JSXGraph
   element. This component must appear as a child of a [[JSXGraph]] component.
 
@@ -983,34 +978,35 @@ to provide any element in `<children>` with access to the bound `board` instance
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/RadicalAxis.html), the map must
   contain an entry `:parents` with value containing the element's required
-  parents."}
-  RadicalAxis
+  parents."
   (k->elem "radicalaxis"))
 
-(def ^{:doc "Reagent component representing
+(def Reflection
+  "Reagent component representing
   the [Reflection](https://jsxgraph.org/docs/symbols/Reflection.html) JSXGraph
   element. This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Reflection.html), the map must contain
-  an entry `:parents` with value containing the element's required parents."}
+  an entry `:parents` with value containing the element's required parents."
 
-  Reflection
   (k->elem "reflection"))
 
-(def ^{:doc "Reagent component representing
-  the [ReflexAngle](https://jsxgraph.org/docs/symbols/ReflexAngle.html) JSXGraph element.
-  This component must appear as a child of a [[JSXGraph]] component.
+(def ReflexAngle
+  "Reagent component representing
+  the [ReflexAngle](https://jsxgraph.org/docs/symbols/ReflexAngle.html) JSXGraph
+  element. This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
-  docs](https://jsxgraph.org/docs/symbols/ReflexAngle.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  ReflexAngle
+  docs](https://jsxgraph.org/docs/symbols/ReflexAngle.html), the map must
+  contain an entry `:parents` with value containing the element's required
+  parents."
   (k->elem "reflexangle"))
 
-(def ^{:doc "Reagent component representing
+(def RegularPolygon
+  "Reagent component representing
   the [RegularPolygon](https://jsxgraph.org/docs/symbols/RegularPolygon.html)
   JSXGraph element. This component must appear as a child of a [[JSXGraph]]
   component.
@@ -1019,234 +1015,242 @@ to provide any element in `<children>` with access to the bound `board` instance
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/RegularPolygon.html), the map must
   contain an entry `:parents` with value containing the element's required
-  parents."}
-  RegularPolygon
+  parents."
   (k->elem "regularpolygon"))
 
-(def ^{:doc "Reagent component representing
+(def RiemannSum
+  "Reagent component representing
   the [RiemannSum](https://jsxgraph.org/docs/symbols/RiemannSum.html) JSXGraph
   element. This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/RiemannSum.html), the map must contain
-  an entry `:parents` with value containing the element's required parents."}
-
-  RiemannSum
+  an entry `:parents` with value containing the element's required parents."
   (k->elem "riemannsum"))
 
-(def ^{:doc "Reagent component representing
+(def Sector
+  "Reagent component representing
   the [Sector](https://jsxgraph.org/docs/symbols/Sector.html) JSXGraph element.
   This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Sector.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  Sector
+  entry `:parents` with value containing the element's required parents."
   (k->elem "sector"))
 
-(def ^{:doc "Reagent component representing
+(def Segment
+  "Reagent component representing
   the [Segment](https://jsxgraph.org/docs/symbols/Segment.html) JSXGraph
   element. This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Segment.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-
-  Segment
+  entry `:parents` with value containing the element's required parents."
   (k->elem "segment"))
 
-(def ^{:doc "Reagent component representing
-  the [Semicircle](https://jsxgraph.org/docs/symbols/Semicircle.html) JSXGraph element.
-  This component must appear as a child of a [[JSXGraph]] component.
+(def Semicircle
+  "Reagent component representing
+  the [Semicircle](https://jsxgraph.org/docs/symbols/Semicircle.html) JSXGraph
+  element. This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
-  docs](https://jsxgraph.org/docs/symbols/Semicircle.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  Semicircle
+  docs](https://jsxgraph.org/docs/symbols/Semicircle.html), the map must contain
+  an entry `:parents` with value containing the element's required parents."
   (k->elem "semicircle"))
 
-(def ^{:doc "Reagent component representing
+(def Slider
+  "Reagent component representing
   the [Slider](https://jsxgraph.org/docs/symbols/Slider.html) JSXGraph element.
   This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Slider.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
+  entry `:parents` with value containing the element's required parents."
 
-  Slider
   (k->elem "slider"))
 
-(def ^{:doc "Reagent component representing
-  the [SlopeTriangle](https://jsxgraph.org/docs/symbols/SlopeTriangle.html) JSXGraph element.
-  This component must appear as a child of a [[JSXGraph]] component.
+(def SlopeTriangle
+  "Reagent component representing
+  the [SlopeTriangle](https://jsxgraph.org/docs/symbols/SlopeTriangle.html)
+  JSXGraph element. This component must appear as a child of a [[JSXGraph]]
+  component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
-  docs](https://jsxgraph.org/docs/symbols/SlopeTriangle.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  SlopeTriangle
+  docs](https://jsxgraph.org/docs/symbols/SlopeTriangle.html), the map must
+  contain an entry `:parents` with value containing the element's required
+  parents."
   (k->elem "slopetriangle"))
 
-(def ^{:doc "Reagent component representing
+(def Spline
+  "Reagent component representing
   the [Spline](https://jsxgraph.org/docs/symbols/Spline.html) JSXGraph element.
   This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Spline.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
+  entry `:parents` with value containing the element's required parents."
 
-  Spline
   (k->elem "spline"))
 
-(def ^{:doc "Reagent component representing
-  the [StepFunction](https://jsxgraph.org/docs/symbols/StepFunction.html) JSXGraph element.
-  This component must appear as a child of a [[JSXGraph]] component.
+(def StepFunction
+  "Reagent component representing
+  the [StepFunction](https://jsxgraph.org/docs/symbols/StepFunction.html)
+  JSXGraph element. This component must appear as a child of a [[JSXGraph]]
+  component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
-  docs](https://jsxgraph.org/docs/symbols/StepFunction.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  StepFunction
+  docs](https://jsxgraph.org/docs/symbols/StepFunction.html), the map must
+  contain an entry `:parents` with value containing the element's required
+  parents."
   (k->elem "stepfunction"))
 
-(def ^{:doc "Reagent component representing
+(def Tangent
+  "Reagent component representing
   the [Tangent](https://jsxgraph.org/docs/symbols/Tangent.html) JSXGraph
   element. This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Tangent.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  Tangent
+  entry `:parents` with value containing the element's required parents."
   (k->elem "tangent"))
 
-(def ^{:doc "Reagent component representing
-  the [TapeMeasure](https://jsxgraph.org/docs/symbols/TapeMeasure.html) JSXGraph element.
-  This component must appear as a child of a [[JSXGraph]] component.
+(def TapeMeasure
+  "Reagent component representing
+  the [TapeMeasure](https://jsxgraph.org/docs/symbols/TapeMeasure.html) JSXGraph
+  element. This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
-  docs](https://jsxgraph.org/docs/symbols/TapeMeasure.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  TapeMeasure
+  docs](https://jsxgraph.org/docs/symbols/TapeMeasure.html), the map must
+  contain an entry `:parents` with value containing the element's required
+  parents."
   (k->elem "tapemeasure"))
 
-(def ^{:doc "Reagent component representing
-  the [Text](https://jsxgraph.org/docs/symbols/Text.html) JSXGraph element.
-  This component must appear as a child of a [[JSXGraph]] component.
+(def Text
+  "Reagent component representing
+  the [Text](https://jsxgraph.org/docs/symbols/Text.html) JSXGraph element. This
+  component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Text.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  Text
+  entry `:parents` with value containing the element's required parents."
   (k->elem "text"))
 
-(def ^{:doc "Reagent component representing
+(def Ticks
+  "Reagent component representing
   the [Ticks](https://jsxgraph.org/docs/symbols/Ticks.html) JSXGraph element.
   This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Ticks.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  Ticks
+  entry `:parents` with value containing the element's required parents."
   (k->elem "ticks"))
 
-(def ^{:doc "Reagent component representing
-  the [TraceCurve](https://jsxgraph.org/docs/symbols/TraceCurve.html) JSXGraph element.
-  This component must appear as a child of a [[JSXGraph]] component.
+(def TraceCurve
+  "Reagent component representing
+  the [TraceCurve](https://jsxgraph.org/docs/symbols/TraceCurve.html) JSXGraph
+  element. This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
-  docs](https://jsxgraph.org/docs/symbols/TraceCurve.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  TraceCurve
+  docs](https://jsxgraph.org/docs/symbols/TraceCurve.html), the map must contain
+  an entry `:parents` with value containing the element's required parents."
   (k->elem "tracecurve"))
 
-(def ^{:doc "Reagent component representing
-  the [Transformation](https://jsxgraph.org/docs/symbols/Transformation.html) JSXGraph element.
-  This component must appear as a child of a [[JSXGraph]] component.
+(def Transformation
+  "Reagent component representing
+  the [Transformation](https://jsxgraph.org/docs/symbols/Transformation.html)
+  JSXGraph element. This component must appear as a child of a [[JSXGraph]]
+  component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
-  docs](https://jsxgraph.org/docs/symbols/Transformation.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  Transformation
+  docs](https://jsxgraph.org/docs/symbols/Transformation.html), the map must
+  contain an entry `:parents` with value containing the element's required
+  parents."
   (k->elem "transformation"))
 
-(def ^{:doc "Reagent component representing
+(def Turtle
+  "Reagent component representing
   the [Turtle](https://jsxgraph.org/docs/symbols/Turtle.html) JSXGraph element.
   This component must appear as a child of a [[JSXGraph]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Turtle.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  Turtle
+  entry `:parents` with value containing the element's required parents."
   (k->elem "turtle"))
 
 ;; ## 3D Components
 
-(def ^{:doc "Reagent component representing
-  the [Curve3D](https://jsxgraph.org/docs/symbols/Curve3D.html) JSXGraph element.
-  This component must appear as a child of a [[View3D]] component.
+(def Curve3D
+  "Reagent component representing
+  the [Curve3D](https://jsxgraph.org/docs/symbols/Curve3D.html) JSXGraph
+  element. This component must appear as a child of a [[View3D]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Curve3D.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  Curve3D
+  entry `:parents` with value containing the element's required parents."
   (k->elem "Curve3d"))
 
-(def ^{:doc "Reagent component representing
-  the [FunctionGraph3D](https://jsxgraph.org/docs/symbols/FunctionGraph3D.html) JSXGraph element.
-  This component must appear as a child of a [[View3D]] component.
+(def FunctionGraph3D
+  "Reagent component representing
+  the [FunctionGraph3D](https://jsxgraph.org/docs/symbols/FunctionGraph3D.html)
+  JSXGraph element. This component must appear as a child of a [[View3D]]
+  component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
-  docs](https://jsxgraph.org/docs/symbols/FunctionGraph3D.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  FunctionGraph3D
+  docs](https://jsxgraph.org/docs/symbols/FunctionGraph3D.html), the map must
+  contain an entry `:parents` with value containing the element's required
+  parents."
   (k->elem "functiongraph3d"))
 
-(def ^{:doc "Reagent component representing
+(def Line3D
+  "Reagent component representing
   the [Line3D](https://jsxgraph.org/docs/symbols/Line3D.html) JSXGraph element.
   This component must appear as a child of a [[View3D]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Line3D.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  Line3D
+  entry `:parents` with value containing the element's required parents."
   (k->elem "Line3d"))
 
-(def ^{:doc "Reagent component representing
-  the [ParametricSurface3D](https://jsxgraph.org/docs/symbols/ParametricSurface3D.html) JSXGraph element.
-  This component must appear as a child of a [[View3D]] component.
+(def ParametricSurface3D
+  "Reagent component representing
+  the [ParametricSurface3D](https://jsxgraph.org/docs/symbols/ParametricSurface3D.html)
+  JSXGraph element. This component must appear as a child of a [[View3D]]
+  component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
-  docs](https://jsxgraph.org/docs/symbols/ParametricSurface3D.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  ParametricSurface3D
+  docs](https://jsxgraph.org/docs/symbols/ParametricSurface3D.html), the map
+  must contain an entry `:parents` with value containing the element's required
+  parents."
   (k->elem "parametricsurface3d"))
 
-(def ^{:doc "Reagent component representing
-  the [Point3D](https://jsxgraph.org/docs/symbols/Point3D.html) JSXGraph element.
-  This component must appear as a child of a [[View3D]] component.
+(def Point3D
+  "Reagent component representing
+  the [Point3D](https://jsxgraph.org/docs/symbols/Point3D.html) JSXGraph
+  element. This component must appear as a child of a [[View3D]] component.
 
   The element takes a single map of attributes. In addition to the optional
   attributes specified in the [API
   docs](https://jsxgraph.org/docs/symbols/Point3D.html), the map must contain an
-  entry `:parents` with value containing the element's required parents."}
-  Point3D
+  entry `:parents` with value containing the element's required parents."
   (k->elem "point3d"))
 
 (defn ^:no-doc k->component [k]
@@ -1303,7 +1307,7 @@ to provide any element in `<children>` with access to the bound `board` instance
 
       :component-will-unmount
       (fn [this]
-        (swap! !board kill! re/props this))
+        (swap! !board kill! (re/props this)))
 
       :component-did-update
       (fn [this [_ p]]

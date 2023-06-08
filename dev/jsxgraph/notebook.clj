@@ -1,8 +1,6 @@
-^#:nextjournal.clerk
-{:toc true
- :no-cache true
- :visibility :hide-ns}
+^{:nextjournal.clerk/visibility {:code :hide}}
 (ns jsxgraph.notebook
+  #:nextjournal.clerk{:toc true :no-cache true}
   (:require [mentat.clerk-utils.docs :as docs]
             [mentat.clerk-utils.show :refer [show-sci]]
             [nextjournal.clerk :as clerk]))
@@ -10,8 +8,8 @@
 ^{::clerk/visibility {:code :hide :result :hide}}
 (clerk/eval-cljs
  ;; These aliases only apply inside this namespace.
- '(require '[jsxgraph.core :as jsx])
- '(require '[reagent.core :as reagent]))
+ '(do (require '[jsxgraph.core :as jsx])
+      (require '[reagent.core :as reagent])))
 
 ;; # JSXGraph.cljs
 ;;
@@ -339,6 +337,7 @@
  (reagent/with-let
    [!state  (reagent/atom {:x 0 :y 0})
     update! (fn [p]
+              (js/console.log p)
               (swap! !state assoc
                      :x (.X p)
                      :y (.Y p)))]
