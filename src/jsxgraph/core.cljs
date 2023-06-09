@@ -5,6 +5,51 @@
             ["react" :as react]
             [reagent.core :as re]))
 
+;; ## Vendored Utilities
+;;
+;; The following five functions come from `reagent.core/props` and
+;; `reagent.core/children`; I'm pulling them in here because SCI doesn't make
+;; this function available, and evaluating `jsxgraph.core` with SCI fails
+;; without this change.
+;;
+;; I'll delete these when I port this namespace to function components and no
+;; longer need this detection.
+
+(defn- shallow-obj-to-map [o]
+  (let [ks (js-keys o)
+        len (alength ks)]
+    (loop [m {}
+           i 0]
+      (if (< i len)
+        (let [k (aget ks i)]
+          (recur (assoc m (keyword k) (aget o k))
+                 (inc i)))
+        m))))
+
+(defn- extract-props [v]
+  (let [p (nth v 1 nil)]
+    (when (map? p) p)))
+
+(defn- get-props [^js c]
+  (let [p (.-props c)]
+    (if-some [v (.-argv p)]
+      (extract-props v)
+      (shallow-obj-to-map p))))
+
+(defn extract-children [v]
+  (let [p (nth v 1 nil)
+        first-child (if (or (nil? p) (map? p)) 2 1)]
+    (when (> (count v) first-child)
+      (subvec v first-child))))
+
+(defn get-children [^js c]
+  (let [p (.-props c)]
+    (if-some [v (.-argv p)]
+      (extract-children v)
+      (->> (.-children p)
+           (react/Children.toArray)
+           (into [])))))
+
 ;; ## Utilities
 
 (defonce ^{:no-doc true
@@ -1303,16 +1348,16 @@
      {:display-name  "JSXGraph"
       :component-did-mount
       (fn [this]
-        (reset! !board (init! (re/props this))))
+        (reset! !board (init! (get-props this))))
 
       :component-will-unmount
       (fn [this]
-        (swap! !board kill! (re/props this)))
+        (swap! !board kill! (get-props this)))
 
       :component-did-update
       (fn [this [_ p]]
         (let [old-props (if (map? p) p {})
-              new-props (or (re/props this) {})]
+              new-props (or (get-props this) {})]
           ;; Remount when the values of any properties change, otherwise don't.
           (when (not= old-props new-props)
             (swap! !board (fn [old-board]
@@ -1320,7 +1365,7 @@
                             (init! new-props))))))
 
       :reagent-render
-      (fn [& _]
+      (fn [_ & children]
         (let [board @!board
               base  [:div {:id id :style style}]]
           ;; On the first load, the board has not mounted itself yet, so ignore
@@ -1341,5 +1386,4 @@
                                   (str "Component " form " has  "
                                        "`nil` or an unrecognized string or "
                                        "keyword in its first entry."))))))))
-                   (re/children
-                    (re/current-component)))])))})))
+                   children)])))})))
