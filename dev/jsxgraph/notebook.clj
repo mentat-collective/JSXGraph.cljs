@@ -337,7 +337,6 @@
  (reagent/with-let
    [!state  (reagent/atom {:x 0 :y 0})
     update! (fn [p]
-              (js/console.log p)
               (swap! !state assoc
                      :x (.X p)
                      :y (.Y p)))]
