@@ -2,6 +2,15 @@
 
 ## [unreleased]
 
+## [0.2.1]
+
+- #34:
+
+  - removes SCI-incompatible code from `jsxgraph.core` to allow JSXGraph.cljs
+    use from Portal.
+
+  - upgrades pieces of the local build (Clerk, kondo etc)
+
 ## [0.2.0]
 
 - #32:
